@@ -18,7 +18,7 @@ func (s *Server) GetHealth(ctx context.Context, request GetHealthRequestObject) 
 func (s *Server) SubmitConversation(ctx context.Context, request SubmitConversationRequestObject) (SubmitConversationResponseObject, error) {
 	response, err := openrouter.GetMachineResponse(request.Body.Prompt)
 	if err != nil {
-		return nil, nil
+		return SubmitConversation500JSONResponse{Error: err.Error()}, nil
 	}
 	return SubmitConversation200JSONResponse{ConversationId: "sample_id", Message: *response}, nil
 }

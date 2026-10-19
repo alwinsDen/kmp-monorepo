@@ -32,10 +32,21 @@ type ConversationSubmitResponse struct {
 	Message        string `json:"message"`
 }
 
+// ErrorResponse defines model for ErrorResponse.
+type ErrorResponse struct {
+	Error string `json:"error"`
+}
+
 // HealthResponse defines model for HealthResponse.
 type HealthResponse struct {
 	Status string `json:"status"`
 }
+
+// BadRequest defines model for BadRequest.
+type BadRequest = ErrorResponse
+
+// InternalServerError defines model for InternalServerError.
+type InternalServerError = ErrorResponse
 
 // SubmitConversationJSONRequestBody defines body for SubmitConversation for application/json ContentType.
 type SubmitConversationJSONRequestBody = ConversationSubmitRequest
@@ -213,6 +224,10 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	return m
 }
 
+type BadRequestJSONResponse ErrorResponse
+
+type InternalServerErrorJSONResponse ErrorResponse
+
 type SubmitConversationRequestObject struct {
 	Body *SubmitConversationJSONRequestBody
 }
@@ -231,6 +246,53 @@ func (response SubmitConversation200JSONResponse) VisitSubmitConversationRespons
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SubmitConversation400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response SubmitConversation400JSONResponse) VisitSubmitConversationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SubmitConversation500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response SubmitConversation500JSONResponse) VisitSubmitConversationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SubmitConversationdefaultJSONResponse struct {
+	Body       ErrorResponse
+	StatusCode int
+}
+
+func (response SubmitConversationdefaultJSONResponse) VisitSubmitConversationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
 	_, err := buf.WriteTo(w)
 	return err
 }
@@ -365,13 +427,15 @@ func (sh *strictHandler) GetHealth(w http.ResponseWriter, r *http.Request) {
 // const string: with thousands of chunks the chained `+` fold is several
 // times slower for the Go compiler than parsing a slice literal.
 var swaggerSpec = []string{
-	"tJJBT90wEIT/ytO2xzROywX51vbQcqvKEXEwzpIYOV7j3SChp/z3ynbKCxDEiZsVT9bfzM4RLE2RAgZh",
-	"0EdgO+JkyvEnhQdMbMRRuJxvJid/8X5GlnwZE0VM4rBIJ+rR54M8RgQNLMmFAZYm66YoO1dLAwnvZ5ew",
-	"B321TnjSXzf/9XRzh1byqD0ejhQYXwPZjfai3yWbkNkM+D7ai1mnP/cgf6PxMr4NxmJk5vcfXXWvn8hC",
-	"F26pjHDi853HKMRfzIBBDt//XEADmdhRAA1d+7XtMhpFDCY60HDWdu1ZDtvIWFjU1qPiEm5hp7rt7OAp",
-	"S6jhb9cBFR5ZflD/uC5AMJSfTYze2Tr6jimcapZPnxPegoZP6tRDVW9Zvd3A5XlekmYsH2rsxdO3rvtQ",
-	"kHXDhaRHtslFqYlv1YcapmCflUsDaiwNyS8OuBPuL5TaIfhAPy9auuPhEtODs3iotKVUSzXAmLI70FdH",
-	"mJMHDaNI1Ep5ssaPxKLPu/MOluvl3wA=",
+	"vJTPbtswDMZfxeB29GJv3YDCt3XYn9yGFjsVPag2E6uQRU2kgwWB332Q5KZu46w7tLnJFvXxp48id1BT",
+	"58iiFYZqBx7ZkWWMHxequcTfPbKEr5qsoI1L5ZzRtRJNtrhjsuEf1y12KqzeelxBBW+KB+ki7XLx1Xvy",
+	"l2MSGIYhhwa59toFMahgaTfK6CbzKXHm1NaQamDIYWkFvVXmCv0GfVQ6Hdc38pkeATKOBBlGhBA7yoQs",
+	"X8hu0HOEuOpvOy0TD50nh1508rejBk1YyNYhVMDitV2HqzpPnZOZrSGH4Iz22EB1PSrs42/y+3i6vcNa",
+	"gtQcz3jNA6B6ErtsZsk6ZFZrfB7tidbDyTnIx/YfcOF9rf+dMoXN6f9AZaQ9noBFSc/PZxjjDlOEQG1X",
+	"FCW0mLBn0AnxO7VGK9nnn0vIITiS3lO5eL8oAxo5tMppqOBsUS7OQjGVtJGlmHpYcCxeZKf0msIN9rWC",
+	"VNxpuSHBI8sFNdsX65XjL3x47Jf4HuOPyUz5UJavCnK8g6fRWTJTMA6Wj2V5LNWevZgMwyGHT/9zZG5g",
+	"RayV6s0JZ+ovi38c1oJNNkLEoKKNXRHk1zjzoL6jpL6BV6zhk86coQ/u6RqzRBsbaUgXSGOYobreQe8N",
+	"VNCKuKooDNXKtMRSnZfnJQw3w98BAA==",
 }
 
 // decodeSpec returns the embedded OpenAPI spec as raw JSON bytes,

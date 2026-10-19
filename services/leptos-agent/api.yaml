@@ -31,8 +31,25 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConversationSubmitResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        default:
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
     HealthResponse:
       type: object
       required:
@@ -60,3 +77,16 @@ components:
           type: string
         message:
           type: string
+  responses:
+    BadRequest:
+      description: Invalid request payload
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    InternalServerError:
+      description: For internal server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"

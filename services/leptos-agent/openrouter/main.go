@@ -2,6 +2,8 @@ package openrouter
 
 import (
 	"context"
+	"errors"
+	"strings"
 
 	"github.com/OpenRouterTeam/go-sdk/models/components"
 )
@@ -27,14 +29,26 @@ func GetMachineResponse(userQuery string) (*string, error) {
 				},
 			),
 		},
+		Stream: new(true),
 	}, nil)
 	if err != nil {
 		return nil, err
 	}
+	var tokenCollector strings.Builder
 	if res != nil {
-		if c, ok := res.ChatResult.Choices[0].Message.Content.Get(); ok && c.Str != nil {
-			return c.Str, nil
+		es := res.EventStream
+		defer es.Close()
+		for es.Next() {
+			chunk := *es.Value()
+			if chunk.Data.Error != nil {
+				return nil, errors.New(chunk.Data.Error.Message)
+			}
+			for _, choice := range chunk.Data.Choices {
+				if c, ok := choice.Delta.Content.Get(); ok {
+					tokenCollector.WriteString(*c)
+				}
+			}
 		}
 	}
-	return nil, nil
+	return new(tokenCollector.String()), nil
 }
