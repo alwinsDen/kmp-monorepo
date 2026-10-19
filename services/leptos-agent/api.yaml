@@ -25,22 +25,10 @@ paths:
             schema:
               $ref: "#/components/schemas/ConversationSubmitRequest"
       responses:
-        "200":
-          description: Conversation submitted
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ConversationSubmitResponse"
         "400":
           $ref: "#/components/responses/BadRequest"
         "500":
           $ref: "#/components/responses/InternalServerError"
-        default:
-          description: Unexpected Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
     ErrorResponse:

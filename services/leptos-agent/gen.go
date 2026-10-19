@@ -26,12 +26,6 @@ type ConversationSubmitRequest struct {
 	Prompt string `json:"prompt"`
 }
 
-// ConversationSubmitResponse defines model for ConversationSubmitResponse.
-type ConversationSubmitResponse struct {
-	ConversationId string `json:"conversationId"`
-	Message        string `json:"message"`
-}
-
 // ErrorResponse defines model for ErrorResponse.
 type ErrorResponse struct {
 	Error string `json:"error"`
@@ -236,20 +230,6 @@ type SubmitConversationResponseObject interface {
 	VisitSubmitConversationResponse(w http.ResponseWriter) error
 }
 
-type SubmitConversation200JSONResponse ConversationSubmitResponse
-
-func (response SubmitConversation200JSONResponse) VisitSubmitConversationResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
 type SubmitConversation400JSONResponse struct{ BadRequestJSONResponse }
 
 func (response SubmitConversation400JSONResponse) VisitSubmitConversationResponse(w http.ResponseWriter) error {
@@ -276,23 +256,6 @@ func (response SubmitConversation500JSONResponse) VisitSubmitConversationRespons
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(500)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type SubmitConversationdefaultJSONResponse struct {
-	Body       ErrorResponse
-	StatusCode int
-}
-
-func (response SubmitConversationdefaultJSONResponse) VisitSubmitConversationResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(response.StatusCode)
 	_, err := buf.WriteTo(w)
 	return err
 }
@@ -427,15 +390,14 @@ func (sh *strictHandler) GetHealth(w http.ResponseWriter, r *http.Request) {
 // const string: with thousands of chunks the chained `+` fold is several
 // times slower for the Go compiler than parsing a slice literal.
 var swaggerSpec = []string{
-	"vJTPbtswDMZfxeB29GJv3YDCt3XYn9yGFjsVPag2E6uQRU2kgwWB332Q5KZu46w7tLnJFvXxp48id1BT",
-	"58iiFYZqBx7ZkWWMHxequcTfPbKEr5qsoI1L5ZzRtRJNtrhjsuEf1y12KqzeelxBBW+KB+ki7XLx1Xvy",
-	"l2MSGIYhhwa59toFMahgaTfK6CbzKXHm1NaQamDIYWkFvVXmCv0GfVQ6Hdc38pkeATKOBBlGhBA7yoQs",
-	"X8hu0HOEuOpvOy0TD50nh1508rejBk1YyNYhVMDitV2HqzpPnZOZrSGH4Iz22EB1PSrs42/y+3i6vcNa",
-	"gtQcz3jNA6B6ErtsZsk6ZFZrfB7tidbDyTnIx/YfcOF9rf+dMoXN6f9AZaQ9noBFSc/PZxjjDlOEQG1X",
-	"FCW0mLBn0AnxO7VGK9nnn0vIITiS3lO5eL8oAxo5tMppqOBsUS7OQjGVtJGlmHpYcCxeZKf0msIN9rWC",
-	"VNxpuSHBI8sFNdsX65XjL3x47Jf4HuOPyUz5UJavCnK8g6fRWTJTMA6Wj2V5LNWevZgMwyGHT/9zZG5g",
-	"RayV6s0JZ+ovi38c1oJNNkLEoKKNXRHk1zjzoL6jpL6BV6zhk86coQ/u6RqzRBsbaUgXSGOYobreQe8N",
-	"VNCKuKooDNXKtMRSnZfnJQw3w98BAA==",
+	"vJNPb9s8DMa/isH3PXqRt25Aods67E9uQ3sselBtNlahiBrFBAgCffdBktu5rbPtUOwmS/TDHx+SR+hp",
+	"G8ijlwj6CIwxkI9YPi7McIk/dhglf/XkBX05mhCc7Y1Y8uo+ks93sR9xa/Lpf8Y70PCf+iWt6mtUn5mJ",
+	"L6ckkFJqYcDYsw1ZDDSs/d44OzRcEzfBHByZAVILay/I3rgr5D1yUfp3XF+IGzsBNLEQNFgQcuwkk7N8",
+	"Ir9HjgXiane7tTLzMDAFZLHV3y0N6PJBDgFBQxS2fpNLDUzbIAtPqYXsjGUcQF9PCo/xN+1DPN3eYy9Z",
+	"6mllLxjwwcbfJ6phS/rf0DgZTyeIYmQX/5xhinuZIgdaf0dFworLbw6DUHxjNuil+fh9DS1k02urutXb",
+	"VZfRKKA3wYKGs1W3Oss+GRkLi+pnbVKx9KmwU21UrqC8rQfQUPs47yxUeIxyQcPh1cbw9PCkp34J77Bc",
+	"zNb1fded0n+MU7OdTi18+JtflvYuFR41luZniQ0u+PYVpY4HPEN913Wv5tmzAVzY3Qxue2wqbZmXVAuo",
+	"ixxBXx9hxw40jCJBK+WoN26kKPq8O+8g3aSfAwA=",
 }
 
 // decodeSpec returns the embedded OpenAPI spec as raw JSON bytes,

@@ -1,26 +1,56 @@
 package main
 
 import (
-	"context"
+	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
+	commonstructs "github.com/alwinsden/kmp-monorepo/services/commonStructs"
 	"github.com/alwinsden/kmp-monorepo/services/leptos-agent/openrouter"
 	"github.com/joho/godotenv"
 )
 
-type Server struct{}
-
-func (s *Server) GetHealth(ctx context.Context, request GetHealthRequestObject) (GetHealthResponseObject, error) {
-	return GetHealth200JSONResponse{Status: "Health is good."}, nil
+type Server struct {
+	strict ServerInterface
 }
 
-func (s *Server) SubmitConversation(ctx context.Context, request SubmitConversationRequestObject) (SubmitConversationResponseObject, error) {
-	response, err := openrouter.GetMachineResponse(request.Body.Prompt)
-	if err != nil {
-		return SubmitConversation500JSONResponse{Error: err.Error()}, nil
+func (s *Server) GetHealth(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(GetHealth200JSONResponse{Status: "Up and running."})
+}
+
+func (s *Server) SubmitConversation(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Expose-Headers", "Content-Type")
+
+	var body SubmitConversationJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(BadRequest{Error: err.Error()})
 	}
-	return SubmitConversation200JSONResponse{ConversationId: "sample_id", Message: *response}, nil
+
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
+
+	ch := make(chan commonstructs.SSEChannelStruct)
+	go func() {
+		openrouter.GetMachineResponse(body.Prompt, ch)
+	}()
+	for token := range ch {
+		if token.Message == "" {
+			continue
+		}
+		b, err := json.Marshal(token)
+		if err != nil {
+			continue
+		}
+		fmt.Fprintf(w, "data: %s\n\n", b)
+		if ss, ok := w.(http.Flusher); ok {
+			ss.Flush()
+		}
+	}
 }
 
 func main() {
@@ -35,7 +65,7 @@ func main() {
 		which registers the handlers for the API endpoints defined
 		in the OpenAPI specification.
 	*/
-	HandlerFromMux(NewStrictHandler(&Server{}, nil), mux)
+	HandlerFromMux(&Server{}, mux)
 
 	addr := ":8080"
 	log.Printf("leptos-agent service listening on %s", addr)
