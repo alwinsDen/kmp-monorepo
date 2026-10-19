@@ -1,21 +1,41 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
+	"context"
 	"log"
 	"net/http"
 
-	commonstructs "github.com/alwinsden/kmp-monorepo/services/commonStructs"
+	"github.com/alwinsden/kmp-monorepo/services/leptos-agent/openrouter"
+	"github.com/joho/godotenv"
 )
+
+type Server struct{}
+
+func (s *Server) GetHealth(ctx context.Context, request GetHealthRequestObject) (GetHealthResponseObject, error) {
+	return GetHealth200JSONResponse{Status: "Health is good."}, nil
+}
+
+func (s *Server) SubmitConversation(ctx context.Context, request SubmitConversationRequestObject) (SubmitConversationResponseObject, error) {
+	response, err := openrouter.GetMachineResponse(request.Body.Prompt)
+	if err != nil {
+		return nil, nil
+	}
+	return SubmitConversation200JSONResponse{ConversationId: "sample_id", Message: *response}, nil
+}
 
 func main() {
 	mux := http.NewServeMux()
-	mux.HandleFunc(fmt.Sprintf("%s /health", commonstructs.ApiTypes.GET), func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(HealthResponse{Status: "ok"})
-	})
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file.")
+	}
+
+	/*
+		HandlerFromMux is from @api.yaml auto-generated code,
+		which registers the handlers for the API endpoints defined
+		in the OpenAPI specification.
+	*/
+	HandlerFromMux(NewStrictHandler(&Server{}, nil), mux)
 
 	addr := ":8080"
 	log.Printf("leptos-agent service listening on %s", addr)

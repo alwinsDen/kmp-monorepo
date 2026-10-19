@@ -9,5 +9,7 @@ kotlin-types:                     ## regenerate Kotlin models -> shared/payloads
 	./gradlew :apps:leptos-agent:shared:sharedLogic:openApiGenerate
 
 SERVICE =
+
+# e.g. make run-server SERVICE=leptos-agent
 run-server:
 	AIR_SERVICE=$(SERVICE) go tool air

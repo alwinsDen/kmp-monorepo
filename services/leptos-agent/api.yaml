@@ -50,8 +50,6 @@ components:
           type: string
         prompt:
           type: string
-        conversationId:
-          type: string
     ConversationSubmitResponse:
       type: object
       required:
