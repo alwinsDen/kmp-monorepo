@@ -20,11 +20,11 @@ func (s *Server) GetHealth(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(GetHealth200JSONResponse{Status: "Up and running."})
 }
 
-func (s *Server) SubmitConversation(w http.ResponseWriter, r *http.Request) {
+func (s *Server) PremiumApi(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Expose-Headers", "Content-Type")
 
-	var body SubmitConversationJSONRequestBody
+	var body PremiumApiJSONRequestBody
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(BadRequest{Error: err.Error()})

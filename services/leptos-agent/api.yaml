@@ -15,9 +15,9 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthResponse"
-  /conversation/submit:
+  /premium/submit:
     post:
-      operationId: submitConversation
+      operationId: premiumApi
       requestBody:
         required: true
         content:

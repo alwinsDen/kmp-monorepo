@@ -42,17 +42,17 @@ type BadRequest = ErrorResponse
 // InternalServerError defines model for InternalServerError.
 type InternalServerError = ErrorResponse
 
-// SubmitConversationJSONRequestBody defines body for SubmitConversation for application/json ContentType.
-type SubmitConversationJSONRequestBody = ConversationSubmitRequest
+// PremiumApiJSONRequestBody defines body for PremiumApi for application/json ContentType.
+type PremiumApiJSONRequestBody = ConversationSubmitRequest
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 
-	// (POST /conversation/submit)
-	SubmitConversation(w http.ResponseWriter, r *http.Request)
-
 	// (GET /health)
 	GetHealth(w http.ResponseWriter, r *http.Request)
+
+	// (POST /premium/submit)
+	PremiumApi(w http.ResponseWriter, r *http.Request)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -64,11 +64,11 @@ type ServerInterfaceWrapper struct {
 
 type MiddlewareFunc func(http.Handler) http.Handler
 
-// SubmitConversation operation middleware
-func (siw *ServerInterfaceWrapper) SubmitConversation(w http.ResponseWriter, r *http.Request) {
+// GetHealth operation middleware
+func (siw *ServerInterfaceWrapper) GetHealth(w http.ResponseWriter, r *http.Request) {
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.SubmitConversation(w, r)
+		siw.Handler.GetHealth(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -78,11 +78,11 @@ func (siw *ServerInterfaceWrapper) SubmitConversation(w http.ResponseWriter, r *
 	handler.ServeHTTP(w, r)
 }
 
-// GetHealth operation middleware
-func (siw *ServerInterfaceWrapper) GetHealth(w http.ResponseWriter, r *http.Request) {
+// PremiumApi operation middleware
+func (siw *ServerInterfaceWrapper) PremiumApi(w http.ResponseWriter, r *http.Request) {
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetHealth(w, r)
+		siw.Handler.PremiumApi(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -213,7 +213,7 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	}
 
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/health", wrapper.GetHealth)
-	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/conversation/submit", wrapper.SubmitConversation)
+	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/premium/submit", wrapper.PremiumApi)
 
 	return m
 }
@@ -221,44 +221,6 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 type BadRequestJSONResponse ErrorResponse
 
 type InternalServerErrorJSONResponse ErrorResponse
-
-type SubmitConversationRequestObject struct {
-	Body *SubmitConversationJSONRequestBody
-}
-
-type SubmitConversationResponseObject interface {
-	VisitSubmitConversationResponse(w http.ResponseWriter) error
-}
-
-type SubmitConversation400JSONResponse struct{ BadRequestJSONResponse }
-
-func (response SubmitConversation400JSONResponse) VisitSubmitConversationResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(400)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type SubmitConversation500JSONResponse struct {
-	InternalServerErrorJSONResponse
-}
-
-func (response SubmitConversation500JSONResponse) VisitSubmitConversationResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(500)
-	_, err := buf.WriteTo(w)
-	return err
-}
 
 type GetHealthRequestObject struct {
 }
@@ -281,14 +243,52 @@ func (response GetHealth200JSONResponse) VisitGetHealthResponse(w http.ResponseW
 	return err
 }
 
+type PremiumApiRequestObject struct {
+	Body *PremiumApiJSONRequestBody
+}
+
+type PremiumApiResponseObject interface {
+	VisitPremiumApiResponse(w http.ResponseWriter) error
+}
+
+type PremiumApi400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response PremiumApi400JSONResponse) VisitPremiumApiResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PremiumApi500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response PremiumApi500JSONResponse) VisitPremiumApiResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
 
-	// (POST /conversation/submit)
-	SubmitConversation(ctx context.Context, request SubmitConversationRequestObject) (SubmitConversationResponseObject, error)
-
 	// (GET /health)
 	GetHealth(ctx context.Context, request GetHealthRequestObject) (GetHealthResponseObject, error)
+
+	// (POST /premium/submit)
+	PremiumApi(ctx context.Context, request PremiumApiRequestObject) (PremiumApiResponseObject, error)
 }
 
 type StrictHandlerFunc func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error)
@@ -330,37 +330,6 @@ type strictHandler struct {
 	options     StrictHTTPServerOptions
 }
 
-// SubmitConversation operation middleware
-func (sh *strictHandler) SubmitConversation(w http.ResponseWriter, r *http.Request) {
-	var request SubmitConversationRequestObject
-
-	var body SubmitConversationJSONRequestBody
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
-		return
-	}
-	request.Body = &body
-
-	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
-		return sh.ssi.SubmitConversation(ctx, request.(SubmitConversationRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "SubmitConversation")
-	}
-
-	response, err := handler(r.Context(), w, r, request)
-
-	if err != nil {
-		sh.options.ResponseErrorHandlerFunc(w, r, err)
-	} else if validResponse, ok := response.(SubmitConversationResponseObject); ok {
-		if err := validResponse.VisitSubmitConversationResponse(w); err != nil {
-			sh.options.ResponseErrorHandlerFunc(w, r, err)
-		}
-	} else if response != nil {
-		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
 // GetHealth operation middleware
 func (sh *strictHandler) GetHealth(w http.ResponseWriter, r *http.Request) {
 	var request GetHealthRequestObject
@@ -385,19 +354,50 @@ func (sh *strictHandler) GetHealth(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// PremiumApi operation middleware
+func (sh *strictHandler) PremiumApi(w http.ResponseWriter, r *http.Request) {
+	var request PremiumApiRequestObject
+
+	var body PremiumApiJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PremiumApi(ctx, request.(PremiumApiRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PremiumApi")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PremiumApiResponseObject); ok {
+		if err := validResponse.VisitPremiumApiResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
 // Base64 encoded, compressed with deflate, json marshaled OpenAPI spec.
 // Stored as a slice of fixed-width chunks rather than one concatenated
 // const string: with thousands of chunks the chained `+` fold is several
 // times slower for the Go compiler than parsing a slice literal.
 var swaggerSpec = []string{
-	"vJNPb9s8DMa/isH3PXqRt25Aods67E9uQ3sselBtNlahiBrFBAgCffdBktu5rbPtUOwmS/TDHx+SR+hp",
-	"G8ijlwj6CIwxkI9YPi7McIk/dhglf/XkBX05mhCc7Y1Y8uo+ks93sR9xa/Lpf8Y70PCf+iWt6mtUn5mJ",
-	"L6ckkFJqYcDYsw1ZDDSs/d44OzRcEzfBHByZAVILay/I3rgr5D1yUfp3XF+IGzsBNLEQNFgQcuwkk7N8",
-	"Ir9HjgXiane7tTLzMDAFZLHV3y0N6PJBDgFBQxS2fpNLDUzbIAtPqYXsjGUcQF9PCo/xN+1DPN3eYy9Z",
-	"6mllLxjwwcbfJ6phS/rf0DgZTyeIYmQX/5xhinuZIgdaf0dFworLbw6DUHxjNuil+fh9DS1k02urutXb",
-	"VZfRKKA3wYKGs1W3Oss+GRkLi+pnbVKx9KmwU21UrqC8rQfQUPs47yxUeIxyQcPh1cbw9PCkp34J77Bc",
-	"zNb1fded0n+MU7OdTi18+JtflvYuFR41luZniQ0u+PYVpY4HPEN913Wv5tmzAVzY3Qxue2wqbZmXVAuo",
-	"ixxBXx9hxw40jCJBK+WoN26kKPq8O+8g3aSfAwA=",
+	"vFRNTxsxEP0rq2mP23hbWgn5BlU/ckNwRBzM7pA18nrc8WykKPJ/r2wHSiBpe0Dcxuu37715HnsLPU2B",
+	"PHqJoLfAGAP5iGVxboZL/DVjlLzqyQv6UpoQnO2NWPLqPpLP32I/4mRy9Z7xDjS8U3+oVd2N6hsz8eVO",
+	"BFJKLQwYe7Yhk4GGpV8bZ4eGq3ATzMaRGSC1sPSC7I27Ql4jF6a38/WduLE7A00sDhosFjJ2R5NVvpJf",
+	"I8di4mq+naw8yTAwBWSxNd+JBnS5kE1A0BCFrV/lVgPTFOTAVmohJ2MZB9DXO4ZH/E37gKfbe+wlU+13",
+	"9sIDPsT4d6EKO8T/E42T8bhAFCNz/LfCDvdSIgOtv6NCYcXlPYdBKH4wK/TSnF0soYUcej2qbvFx0WVr",
+	"FNCbYEHDyaJbnOScjIzFixqL7VyusASdPZdDWw6g4QdKbQza/TvxqetebeieRXdg6vKo2x6b6rZ0mgpM",
+	"BcbJzpOKZcRK7BQPNHJRcWfBQs0bo5zTsHm1Jo7Pe9o/YuEZ07M0P3fdMf5HnHryDKUWvvzPL4eeilST",
+	"q3c3gr7ewswONIwiQSvlqDdupCj6tDvtIN2k3wMA",
 }
 
 // decodeSpec returns the embedded OpenAPI spec as raw JSON bytes,
