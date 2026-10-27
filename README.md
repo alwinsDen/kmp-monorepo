@@ -64,7 +64,7 @@ generated from it:
 ```sh
 make generate                                                                            # regenerate both sides
 go tool oapi-codegen -config services/leptos-agent/oapi-codegen.yaml services/api.yaml  # Go types → services/leptos-agent/gen.go
-./gradlew :apps:leptos-agent:shared:openApiGenerate                         # Kotlin models → :shared:sharedLogic
+./gradlew :apps:leptos-agent:shared:openApiGenerate                         # Kotlin models → :shared
 ```
 
 `make generate` (see the [Makefile](./Makefile)) runs both generators; the individual commands are its `go-types`
@@ -73,14 +73,14 @@ and `kotlin-models` targets.
 To add or modify an endpoint/payload, edit `services/api.yaml` and rerun both generators — never hand-edit
 `services/leptos-agent/gen.go` or the generated Kotlin models under
 `apps/leptos-agent/shared`. (The Kotlin generation also runs automatically before every
-`:shared:sharedLogic` compilation.)
+`:shared` compilation.)
 
 ### Adding a new app
 
 1. Create the app modules under `apps/<new-app>/` (e.g. `apps/<new-app>/androidApp` and
    `apps/<new-app>/shared/<module>`).
 2. Add them to [settings.gradle.kts](./settings.gradle.kts) via `include(":apps:<new-app>:androidApp")`.
-3. Depend on the shared modules with `project(":apps:<new-app>:shared:sharedLogic")` /
+3. [Now :sharedUI has been removed.] Depend on the shared modules with `project(":apps:<new-app>:shared")` /
    `project(":apps:<new-app>:shared:sharedUI")`.
 4. For iOS, copy `apps/leptos-agent/iosApp` as a starting point and make sure its Gradle script phase points at
    the repo root (`cd "$SRCROOT/../../.."`) and the correct `embedAndSignAppleFrameworkForXcode` task path.

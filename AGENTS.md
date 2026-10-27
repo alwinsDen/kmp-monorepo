@@ -63,9 +63,7 @@ never hand-edit `services/leptos-agent/gen.go` or the generated Kotlin models un
 
 ## Module graph
 
-`:apps:leptos-agent:androidApp` → `:apps:leptos-agent:shared:sharedUI` (Compose Multiplatform,
-`api(project(":apps:leptos-agent:shared:sharedLogic"))`) → `:apps:leptos-agent:shared:sharedLogic`.
-
+shared
 - `apps/leptos-agent/shared` — shared non-UI logic; also produces the static framework `SharedLogic` (iosArm64,
   iosSimulatorArm64) consumed by the iOS app.
 - `apps/leptos-agent/shared/sharedUI` — shared Compose UI; Compose resources live in
