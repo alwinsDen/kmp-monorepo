@@ -9,7 +9,7 @@ Multiplatform 1.11.x, compileSdk 36 / minSdk 24).
 ```sh
 ./gradlew :apps:leptos-agent:androidApp:assembleDebug   # build Leptos Agent Android app
 ./gradlew allTests                    # all module tests (kotlin-test/JUnit)
-./gradlew :apps:leptos-agent:shared:sharedLogic:allTests # tests for one module
+./gradlew :apps:leptos-agent:shared:allTests # tests for one module
 ./gradlew :apps:leptos-agent:androidApp:installDebug    # install to connected device/emulator
 ```
 
@@ -47,7 +47,7 @@ go test ./...                    # tests for all services
 
 ```sh
 go tool oapi-codegen -config services/leptos-agent/oapi-codegen.yaml services/api.yaml  # regenerates Go types into services/leptos-agent/gen.go (do not edit)
-./gradlew :apps:leptos-agent:shared:sharedLogic:openApiGenerate                         # regenerates Kotlin models into sharedLogic (auto-runs before compilation too)
+./gradlew :apps:leptos-agent:shared:openApiGenerate                         # regenerates Kotlin models into sharedLogic (auto-runs before compilation too)
 ```
 
 To add/modify an endpoint or payload, edit `services/api.yaml` and rerun both generators (`make generate` runs both) —
@@ -80,7 +80,7 @@ never hand-edit `services/leptos-agent/gen.go` or the generated Kotlin models un
 - **Only `shared` exports an iOS framework.** The iOS app is currently pure SwiftUI (`apps/leptos-agent/iosApp/`) and
   imports only `SharedLogic`. Shared Compose UI in `sharedUI` is used by Android only — do not assume iOS renders it.
 - **Xcode script phase paths:** the iOS app's Gradle build phase does `cd "$SRCROOT/../../.."` (repo root) and runs
-  `:apps:leptos-agent:shared:sharedLogic:embedAndSignAppleFrameworkForXcode`. New apps' iosApp folders sit at the same
+  `:apps:leptos-agent:shared:embedAndSignAppleFrameworkForXcode`. New apps' iosApp folders sit at the same
   depth (`apps/<app>/iosApp`), so the same `../../..` applies.
 - **Compose `Res` package is pinned** via `packageOfResClass` in `sharedUI/build.gradle.kts`
   (`leptos_agent.sharedui.generated.resources`) so it doesn't shift if the module path changes. New modules with Compose

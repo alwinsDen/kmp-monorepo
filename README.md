@@ -29,14 +29,14 @@ services (`services/`).
 ./gradlew :apps:leptos-agent:androidApp:assembleDebug      # build the Android app
 ./gradlew :apps:leptos-agent:androidApp:installDebug       # install to a connected device/emulator
 ./gradlew allTests                                         # run all module tests
-./gradlew :apps:leptos-agent:shared:sharedLogic:allTests   # run tests for one module
+./gradlew :apps:leptos-agent:shared:allTests   # run tests for one module
 ```
 
 ### iOS
 
 Open [apps/leptos-agent/iosApp](./apps/leptos-agent/iosApp) in Xcode and run it from there — there is no Gradle iOS
 app target. The Xcode build phase runs
-`:apps:leptos-agent:shared:sharedLogic:embedAndSignAppleFrameworkForXcode` from the repo root.
+`:apps:leptos-agent:shared:embedAndSignAppleFrameworkForXcode` from the repo root.
 
 ### Go services
 
