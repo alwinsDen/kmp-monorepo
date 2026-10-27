@@ -11,11 +11,11 @@ kotlin {
     }
 }
 dependencies {
-    implementation(project(":apps:leptos-agent:shared:sharedUI"))
 
     implementation(libs.androidx.activity.compose)
 
     implementation(libs.compose.uiToolingPreview)
+    implementation(libs.androidx.material3)
     debugImplementation(libs.compose.uiTooling)
 }
 

@@ -1,10 +1,12 @@
-import SharedLogic
+import Shared
 import SwiftUI
 
 struct ContentView: View {
-    @State private var username: String = ""
+    @StateObject private var viewModel = ChatViewModel()
+    @State private var username: String = "hi there! how are you?"
     @State private var showLeptosWork = true
     @State private var showContent = false
+
     var body: some View {
         VStack {
             ScrollView(){
@@ -73,6 +75,7 @@ struct ContentView: View {
                     Spacer().frame(width: 20)
                     Button{
                         showLeptosWork = !showLeptosWork;
+                        Task { await viewModel.send(prompt: username) }
                     } label: {
                         SharedIcon(systemName: "paperplane.circle.fill")
                     }
@@ -85,5 +88,9 @@ struct ContentView: View {
                 .padding(.bottom, 12)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .task {
+            await viewModel.checkHealth()
+            print("backend health: \(viewModel.healthStatus)")
+        }
     }
 }

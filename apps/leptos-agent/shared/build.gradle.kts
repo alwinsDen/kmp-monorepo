@@ -13,13 +13,13 @@ kotlin {
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            baseName = "SharedLogic"
+            baseName = "Shared"
             isStatic = true
         }
     }
 
     android {
-        namespace = "com.alwinsden.leptosagent.sharedLogic"
+        namespace = "com.alwinsden.leptosagent.shared"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
 
@@ -39,7 +39,17 @@ kotlin {
             kotlin.srcDir(layout.buildDirectory.dir("generated/openapi/src/main/kotlin"))
             dependencies {
                 api(libs.kotlinx.serialization.core)
+                implementation(libs.kotlinx.serialization.json)
+                implementation(ktorLibs.client.core)
+                implementation(ktorLibs.client.contentNegotiation)
+                implementation(ktorLibs.serialization.kotlinx.json)
             }
+        }
+        androidMain.dependencies {
+            implementation(ktorLibs.client.okhttp)
+        }
+        iosMain.dependencies {
+            implementation(ktorLibs.client.darwin)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -53,8 +63,8 @@ tasks.openApiGenerate {
     generatorName.set("kotlin")
     inputSpec.set(rootProject.file("services/leptos-agent/api.yaml").absolutePath)
     outputDir.set(layout.buildDirectory.dir("generated/openapi").get().asFile.absolutePath)
-    modelPackage.set("com.alwinsden.leptosagent.sharedLogic")
-    apiPackage.set("com.alwinsden.leptosagent.sharedLogic")
+    modelPackage.set("com.alwinsden.leptosagent.shared")
+    apiPackage.set("com.alwinsden.leptosagent.shared")
     globalProperties.set(
         mapOf(
             "models" to "",
@@ -71,5 +81,11 @@ tasks.openApiGenerate {
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask<*>>().configureEach {
+    dependsOn(tasks.openApiGenerate)
+}
+
+// The OpenAPI generator also writes into generated/openapi/src/main/baselineProfiles,
+// which AGP's ART profile task consumes; make the ordering explicit.
+tasks.matching { it.name == "prepareAndroidMainArtProfile" }.configureEach {
     dependsOn(tasks.openApiGenerate)
 }

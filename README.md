@@ -9,8 +9,8 @@ services (`services/`).
     - [androidApp](./apps/leptos-agent/androidApp) — Android entry point (`com.alwinsden.leptosagent.MainActivity`)
     - [iosApp](./apps/leptos-agent/iosApp/iosApp) — iOS entry point (SwiftUI). This is where you add SwiftUI code for
       the app. It is pure SwiftUI and consumes only the `SharedLogic` Kotlin framework.
-    - [shared/sharedLogic](./apps/leptos-agent/shared/sharedLogic/src) — non-UI logic shared between the app's targets.
-      The most important subfolder is [commonMain](./apps/leptos-agent/shared/sharedLogic/src/commonMain/kotlin). If
+    - [shared/sharedLogic](apps/leptos-agent/shared/src) — non-UI logic shared between the app's targets.
+      The most important subfolder is [commonMain](apps/leptos-agent/shared/src/commonMain/kotlin). If
       preferred, you can add code to the platform-specific folders here too. Also produces the static iOS framework
       `SharedLogic`, which carries the OpenAPI-generated payload types (visible from Swift).
     - [shared/sharedUI](./apps/leptos-agent/shared/sharedUI/src) — Compose Multiplatform UI (used by Android; the iOS
@@ -64,7 +64,7 @@ generated from it:
 ```sh
 make generate                                                                            # regenerate both sides
 go tool oapi-codegen -config services/leptos-agent/oapi-codegen.yaml services/api.yaml  # Go types → services/leptos-agent/gen.go
-./gradlew :apps:leptos-agent:shared:sharedLogic:openApiGenerate                         # Kotlin models → :shared:sharedLogic
+./gradlew :apps:leptos-agent:shared:openApiGenerate                         # Kotlin models → :shared:sharedLogic
 ```
 
 `make generate` (see the [Makefile](./Makefile)) runs both generators; the individual commands are its `go-types`
@@ -72,7 +72,7 @@ and `kotlin-models` targets.
 
 To add or modify an endpoint/payload, edit `services/api.yaml` and rerun both generators — never hand-edit
 `services/leptos-agent/gen.go` or the generated Kotlin models under
-`apps/leptos-agent/shared/sharedLogic/build/generated`. (The Kotlin generation also runs automatically before every
+`apps/leptos-agent/shared`. (The Kotlin generation also runs automatically before every
 `:shared:sharedLogic` compilation.)
 
 ### Adding a new app
