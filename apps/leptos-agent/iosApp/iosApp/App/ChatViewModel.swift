@@ -3,11 +3,12 @@ import Shared
 
 @MainActor
 final class ChatViewModel: ObservableObject {
-    private static let apiBaseUrl : String = "http://localhost:8080"
+    private static let apiBaseUrl: String = "http://192.168.11.198:8080"
     private let api = ApiClient(baseUrl: apiBaseUrl)
 
     @Published var healthStatus: String = ""
     @Published var isWorking = false
+    @Published var transcriptResponse = ""
 
     func checkHealth() async {
         do {
@@ -23,12 +24,15 @@ final class ChatViewModel: ObservableObject {
         isWorking = true
         defer { isWorking = false }
         do {
-            let response = try await api.submitConversation(
+            let response = try await api.submitConversationStream(
                 request: ConversationSubmitRequest(model: "leptos-basic", prompt: prompt)
-            )
-            print("conversation \(response.conversationId): \(response.message)")
+            ) { token in
+                DispatchQueue.main.async {
+                    self.transcriptResponse += token.message ?? ""
+                }
+            }
         } catch {
-            print("submit failed: \(error)")
+            print("stream failed: \(error)")
         }
     }
 }

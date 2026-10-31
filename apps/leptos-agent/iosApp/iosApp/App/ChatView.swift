@@ -2,8 +2,8 @@ import Shared
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var viewModel = ChatViewModel()
-    @State private var username: String = "hi there! how are you?"
+    @StateObject private var chatViewModel = ChatViewModel()
+    @State private var username: String = ""
     @State private var showLeptosWork = true
     @State private var showContent = false
 
@@ -12,7 +12,7 @@ struct ContentView: View {
             ScrollView(){
                 HStack {
                     VStack{
-                        Text("Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library in London, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software like Aldus PageMaker and Microsoft Word including versions of Lorem Ipsum.")
+                        Text("TEst1 TEst1 TEst1 TEst1 TEst1 TEst1 TEst1 TEst1 TEst1 TEst1 TEst1")
                     }.padding(16)
                         .background(.ultraThinMaterial, in: .rect(cornerRadius: 24))
                 }
@@ -27,7 +27,7 @@ struct ContentView: View {
                     } else {
                         Spacer().frame(height: 10)
                     }
-                    Text("test Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library in London, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software like Aldus PageMaker and Microsoft Word including versions of Lorem Ipsum.")
+                    Text(chatViewModel.transcriptResponse)
                         .padding(.vertical, 0)
                 }
             }
@@ -75,7 +75,7 @@ struct ContentView: View {
                     Spacer().frame(width: 20)
                     Button{
                         showLeptosWork = !showLeptosWork;
-                        Task { await viewModel.send(prompt: username) }
+                        Task { await chatViewModel.send(prompt: username) }
                     } label: {
                         SharedIcon(systemName: "paperplane.circle.fill")
                     }
@@ -89,8 +89,8 @@ struct ContentView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .task {
-            await viewModel.checkHealth()
-            print("backend health: \(viewModel.healthStatus)")
+            await chatViewModel.checkHealth()
+            print("backend health: \(chatViewModel.healthStatus)")
         }
     }
 }

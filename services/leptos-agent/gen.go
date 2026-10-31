@@ -12,6 +12,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"path"
@@ -24,6 +25,12 @@ import (
 type ConversationSubmitRequest struct {
 	Model  string `json:"model"`
 	Prompt string `json:"prompt"`
+}
+
+// ConversationSubmitResponse defines model for ConversationSubmitResponse.
+type ConversationSubmitResponse struct {
+	Message *string `json:"message,omitempty"`
+	Type    string  `json:"type"`
 }
 
 // ErrorResponse defines model for ErrorResponse.
@@ -251,6 +258,49 @@ type PremiumApiResponseObject interface {
 	VisitPremiumApiResponse(w http.ResponseWriter) error
 }
 
+type PremiumApi200TexteventStreamResponse struct {
+	Body          io.Reader
+	ContentLength int64
+}
+
+func (response PremiumApi200TexteventStreamResponse) VisitPremiumApiResponse(w http.ResponseWriter) error {
+
+	w.Header().Set("Content-Type", "text/event-stream")
+	if response.ContentLength != 0 {
+		w.Header().Set("Content-Length", fmt.Sprint(response.ContentLength))
+	}
+	w.WriteHeader(200)
+
+	if closer, ok := response.Body.(io.ReadCloser); ok {
+		defer closer.Close()
+	}
+	flusher, ok := w.(http.Flusher)
+	if !ok {
+		// If w doesn't support flushing, fall back to io.Copy.
+		_, err := io.Copy(w, response.Body)
+		return err
+	}
+	// text/event-stream messages are typically small; use a
+	// modest buffer and flush after each chunk so clients see
+	// events immediately instead of waiting on OS buffering.
+	buf := make([]byte, 4096)
+	for {
+		n, err := response.Body.Read(buf)
+		if n > 0 {
+			if _, writeErr := w.Write(buf[:n]); writeErr != nil {
+				return writeErr
+			}
+			flusher.Flush()
+		}
+		if err != nil {
+			if err == io.EOF {
+				return nil
+			}
+			return err
+		}
+	}
+}
+
 type PremiumApi400JSONResponse struct{ BadRequestJSONResponse }
 
 func (response PremiumApi400JSONResponse) VisitPremiumApiResponse(w http.ResponseWriter) error {
@@ -390,14 +440,15 @@ func (sh *strictHandler) PremiumApi(w http.ResponseWriter, r *http.Request) {
 // const string: with thousands of chunks the chained `+` fold is several
 // times slower for the Go compiler than parsing a slice literal.
 var swaggerSpec = []string{
-	"vFRNTxsxEP0rq2mP23hbWgn5BlU/ckNwRBzM7pA18nrc8WykKPJ/r2wHSiBpe0Dcxuu37715HnsLPU2B",
-	"PHqJoLfAGAP5iGVxboZL/DVjlLzqyQv6UpoQnO2NWPLqPpLP32I/4mRy9Z7xDjS8U3+oVd2N6hsz8eVO",
-	"BFJKLQwYe7Yhk4GGpV8bZ4eGq3ATzMaRGSC1sPSC7I27Ql4jF6a38/WduLE7A00sDhosFjJ2R5NVvpJf",
-	"I8di4mq+naw8yTAwBWSxNd+JBnS5kE1A0BCFrV/lVgPTFOTAVmohJ2MZB9DXO4ZH/E37gKfbe+wlU+13",
-	"9sIDPsT4d6EKO8T/E42T8bhAFCNz/LfCDvdSIgOtv6NCYcXlPYdBKH4wK/TSnF0soYUcej2qbvFx0WVr",
-	"FNCbYEHDyaJbnOScjIzFixqL7VyusASdPZdDWw6g4QdKbQza/TvxqetebeieRXdg6vKo2x6b6rZ0mgpM",
-	"BcbJzpOKZcRK7BQPNHJRcWfBQs0bo5zTsHm1Jo7Pe9o/YuEZ07M0P3fdMf5HnHryDKUWvvzPL4eeilST",
-	"q3c3gr7ewswONIwiQSvlqDdupCj6tDvtIN2k3wMA",
+	"vJRBb9s8DIb/isHvO7qRt25AoVs7dFtuRXsselBtNlYhS5pIBysC/fdBktMli7MMWLGbbFF8H74UtYHW",
+	"Dd5ZtEwgNxCQvLOE+eNKdbf4bUTi9NU6y2jzUnlvdKtYOyueydn0j9oeB5VW/wd8Agn/iZ+pRdklcR2C",
+	"C7eTCMQYa+iQ2qB9SgYSlnatjO6qUIQrr16MUx3EGpaWMVhl7jCsMeRM/47rswuVngAqygQVZoQUO6VJ",
+	"Kp+cXWOgDHE3Pg6adzz0wXkMrIu/g+vQpAW/eAQJxEHbVSrVBzd4ntmKNSRndMAO5P2U4TX+od7Gu8dn",
+	"bDmlmuOZyjwEQiK1wlmk8uMUULujtuxgOjbHte/4AQpu2/t7vRI2l/8rKsP9cQFixSOdVpjiDiVSoLZP",
+	"LqfQbNKeQc+OztQKLVeXN0uoIdlRrlCzeLdoEprzaJXXIOF80SzOU/8U95lF9Bk7LVeYL0Bi3top4Qty",
+	"KQzq/Vl93zRvNgy/WDczDWkEdYtVoc2VxhwmfMBBj4OgfNWy7Y5mCrkpcZdeQ/Ebia9c9/JmRRyfw7jf",
+	"Yg4jxpNuMn5ngWu0fEYcUA1/R3Lc2uukUU0asYYPTXNM4BVZ7LzUsYaPf3Jk7jWNpYnleSOQ9xsYgwEJ",
+	"PbOXQhjXKtM7YnnRXDQQH+KPAQA=",
 }
 
 // decodeSpec returns the embedded OpenAPI spec as raw JSON bytes,
