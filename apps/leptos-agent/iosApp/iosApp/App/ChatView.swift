@@ -1,11 +1,13 @@
 import Shared
 import SwiftUI
+import Textual
 
 struct ContentView: View {
     @StateObject private var chatViewModel = ChatViewModel()
     @State private var userQuery: String = ""
     @State private var showLeptosWork = false
     @State private var showContent = false
+    @FocusState private var isChatInputInFocus: Bool
     
     private func scrollToBottom(_ proxy: ScrollViewProxy) {
         if let last = chatViewModel.chatArray.last {
@@ -30,11 +32,14 @@ struct ContentView: View {
                                     .background(.ultraThinMaterial, in: .rect(cornerRadius: 24))
                                 }.id(arrayDetails.id)
                                 .padding(.trailing, 16)
+                                .padding(.bottom, 8)
                             }
                             if(!chatViewModel.transcriptResponse.isEmpty && !arrayDetails.isUser){
                                 VStack{
-                                    Text(arrayDetails.text)
-                                }
+                                    StructuredText(markdown:arrayDetails.text)
+                                }.frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.horizontal, 12)
+                                    .padding(.bottom, 8)
                             }
                         }
                     }
@@ -47,8 +52,14 @@ struct ContentView: View {
                                 .progressViewStyle(.circular)
                                 .controlSize(.regular)
                             Text("leptos at work...")
+                                .phaseAnimator([0.15,1.0,1.0]){text, opacity in
+                                    text.opacity(opacity)
+                                } animation: { _ in
+                                    .easeInOut(duration: 0.7)
+                                }
                             Spacer()
                         }.padding(.vertical, 0)
+                            .padding(.horizontal, 12)
                     }
                 }
                 .ignoresSafeArea(.keyboard, edges: .bottom)
@@ -57,14 +68,15 @@ struct ContentView: View {
                 .onChange(of: chatViewModel.chatArray.count){_,_ in
                     scrollToBottom(proxy)
                 }
-                .onChange(of: chatViewModel.chatArray.last?.text) {_,_ in
-                    scrollToBottom(proxy)
-                }
+//                .onChange(of: chatViewModel.chatArray.last?.text) {_,_ in
+//                    scrollToBottom(proxy)
+//                }
             }
             VStack {
                 TextField("Ask Leptos agent...", text: $userQuery, axis: .vertical)
                     .lineLimit(6)
                     .multilineTextAlignment(.leading)
+                    .focused($isChatInputInFocus)
                 Spacer().frame(height: 20)
                 HStack {
                     Menu {
@@ -101,7 +113,12 @@ struct ContentView: View {
                     .buttonStyle(.plain)
                     Spacer().frame(width: 20)
                     Button{
-                        Task { await chatViewModel.send(prompt: userQuery) }
+                        isChatInputInFocus = false
+                        let prompt = userQuery
+                        userQuery = ""
+                        Task {
+                            await chatViewModel.send(prompt: prompt)
+                        }
                     } label: {
                         SharedIcon(systemName: "paperplane.circle.fill")
                     }
@@ -110,7 +127,7 @@ struct ContentView: View {
                 }
             }.padding(12)
                 .background(.ultraThinMaterial, in: .rect(cornerRadius: 14))
-                .padding(.horizontal, 6)
+                .padding(.horizontal, 15)
                 .padding(.bottom, 12)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)

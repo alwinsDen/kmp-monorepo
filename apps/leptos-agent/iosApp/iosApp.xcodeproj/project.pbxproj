@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		523735A830555A5C00ADB8F4 /* DotLottie in Frameworks */ = {isa = PBXBuildFile; productRef = 523735A730555A5C00ADB8F4 /* DotLottie */; };
 		523735AA30555A5C00ADB8F4 /* DotLottiePlayer in Frameworks */ = {isa = PBXBuildFile; productRef = 523735A930555A5C00ADB8F4 /* DotLottiePlayer */; };
+		5247212A3096333800628422 /* Textual in Frameworks */ = {isa = PBXBuildFile; productRef = 524721293096333800628422 /* Textual */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -16,7 +17,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		5464FE8EF4D1913EAE0943AA /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		5464FE8EF4D1913EAE0943AA /* Exceptions for "iosApp" folder in "iosApp" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -28,21 +29,13 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		43ABBB539B36A4E51DC3A6C6 /* Configuration */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
 			path = Configuration;
 			sourceTree = "<group>";
 		};
 		8D5A8E00278A4DEC3CEDB87E /* iosApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				5464FE8EF4D1913EAE0943AA /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
+				5464FE8EF4D1913EAE0943AA /* Exceptions for "iosApp" folder in "iosApp" target */,
 			);
 			path = iosApp;
 			sourceTree = "<group>";
@@ -54,6 +47,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5247212A3096333800628422 /* Textual in Frameworks */,
 				523735AA30555A5C00ADB8F4 /* DotLottiePlayer in Frameworks */,
 				523735A830555A5C00ADB8F4 /* DotLottie in Frameworks */,
 			);
@@ -102,6 +96,7 @@
 			packageProductDependencies = (
 				523735A730555A5C00ADB8F4 /* DotLottie */,
 				523735A930555A5C00ADB8F4 /* DotLottiePlayer */,
+				524721293096333800628422 /* Textual */,
 			);
 			productName = iosApp;
 			productReference = F9353959E58E30976DE69BD8 /* leptos-agent.app */;
@@ -133,6 +128,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				523735A630555A5C00ADB8F4 /* XCRemoteSwiftPackageReference "dotlottie-ios" */,
+				524721283096333800628422 /* XCRemoteSwiftPackageReference "textual" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = CE20379B2B361619FA4A0D48 /* Products */;
@@ -402,6 +398,14 @@
 				kind = branch;
 			};
 		};
+		524721283096333800628422 /* XCRemoteSwiftPackageReference "textual" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/gonzalezreal/textual";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.5.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -414,6 +418,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 523735A630555A5C00ADB8F4 /* XCRemoteSwiftPackageReference "dotlottie-ios" */;
 			productName = DotLottiePlayer;
+		};
+		524721293096333800628422 /* Textual */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 524721283096333800628422 /* XCRemoteSwiftPackageReference "textual" */;
+			productName = Textual;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -60,7 +60,7 @@ class ApiClient(
                 try {
                     onToken(json.decodeFromString<ConversationSubmitResponse>(payload))
                 } catch (_: SerializationException) {
-
+                    //
                 }
             }
         }
