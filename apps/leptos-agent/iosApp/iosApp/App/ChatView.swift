@@ -6,35 +6,61 @@ struct ContentView: View {
     @State private var userQuery: String = ""
     @State private var showLeptosWork = false
     @State private var showContent = false
+    
+    private func scrollToBottom(_ proxy: ScrollViewProxy) {
+        if let last = chatViewModel.chatArray.last {
+            withAnimation(.easeOut(duration: 0.15)) {
+                proxy.scrollTo(last.id, anchor: .bottom)
+            }
+        }
+    }
 
     var body: some View {
         VStack {
-            ScrollView(){
-                HStack {
-                    Spacer()
-                    VStack{
-                        Text("hi")
-                    }.padding(16)
-                        .background(.ultraThinMaterial, in: .rect(cornerRadius: 24))
-                }
-                .padding(.trailing, 16)
-                VStack{
+            ScrollViewReader{proxy in
+                ScrollView(){
+                    LazyVStack {
+                        ForEach(chatViewModel.chatArray) {arrayDetails in
+                            if(arrayDetails.isUser){
+                                HStack {
+                                    Spacer()
+                                    VStack{
+                                        Text(arrayDetails.text)
+                                    }.padding(16)
+                                    .background(.ultraThinMaterial, in: .rect(cornerRadius: 24))
+                                }.id(arrayDetails.id)
+                                .padding(.trailing, 16)
+                            }
+                            if(!chatViewModel.transcriptResponse.isEmpty && !arrayDetails.isUser){
+                                VStack{
+                                    Text(arrayDetails.text)
+                                }
+                            }
+                        }
+                    }
                     if(chatViewModel.sendPhaseState == .connecting){
                         HStack {
-                            RunLottie(fileName: "loader_cat", size: 64)
+    //                        RunLottie(fileName: "loader_cat", size: 64)
+    //                        Text("leptos at work...")
+    //                        Spacer()
+                            ProgressView()
+                                .progressViewStyle(.circular)
+                                .controlSize(.regular)
                             Text("leptos at work...")
                             Spacer()
-                        }
-                    } else {
-                        Spacer().frame(height: 10)
+                        }.padding(.vertical, 0)
                     }
-                    Text(chatViewModel.transcriptResponse)
-                        .padding(.vertical, 0)
+                }
+                .ignoresSafeArea(.keyboard, edges: .bottom)
+                .scrollDismissesKeyboard(.immediately)
+                .padding(.leading, 10)
+                .onChange(of: chatViewModel.chatArray.count){_,_ in
+                    scrollToBottom(proxy)
+                }
+                .onChange(of: chatViewModel.chatArray.last?.text) {_,_ in
+                    scrollToBottom(proxy)
                 }
             }
-            .ignoresSafeArea(.keyboard, edges: .bottom)
-            .scrollDismissesKeyboard(.immediately)
-            .padding(.leading, 10)
             VStack {
                 TextField("Ask Leptos agent...", text: $userQuery, axis: .vertical)
                     .lineLimit(6)
