@@ -8,10 +8,3 @@ struct iOSApp: App {
         }
     }
 }
-
-
-struct iOSApp_Previews: PreviewProvider {
-    static var previews: some View {
-        NavigationController()
-    }
-}

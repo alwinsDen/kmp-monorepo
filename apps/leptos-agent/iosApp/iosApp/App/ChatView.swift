@@ -3,22 +3,23 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var chatViewModel = ChatViewModel()
-    @State private var username: String = ""
-    @State private var showLeptosWork = true
+    @State private var userQuery: String = ""
+    @State private var showLeptosWork = false
     @State private var showContent = false
 
     var body: some View {
         VStack {
             ScrollView(){
                 HStack {
+                    Spacer()
                     VStack{
-                        Text("TEst1 TEst1 TEst1 TEst1 TEst1 TEst1 TEst1 TEst1 TEst1 TEst1 TEst1")
+                        Text("hi")
                     }.padding(16)
                         .background(.ultraThinMaterial, in: .rect(cornerRadius: 24))
                 }
                 .padding(.trailing, 16)
                 VStack{
-                    if(showLeptosWork){
+                    if(chatViewModel.sendPhaseState == .connecting){
                         HStack {
                             RunLottie(fileName: "loader_cat", size: 64)
                             Text("leptos at work...")
@@ -35,7 +36,7 @@ struct ContentView: View {
             .scrollDismissesKeyboard(.immediately)
             .padding(.leading, 10)
             VStack {
-                TextField("Ask Leptos agent...", text: $username, axis: .vertical)
+                TextField("Ask Leptos agent...", text: $userQuery, axis: .vertical)
                     .lineLimit(6)
                     .multilineTextAlignment(.leading)
                 Spacer().frame(height: 20)
@@ -74,8 +75,7 @@ struct ContentView: View {
                     .buttonStyle(.plain)
                     Spacer().frame(width: 20)
                     Button{
-                        showLeptosWork = !showLeptosWork;
-                        Task { await chatViewModel.send(prompt: username) }
+                        Task { await chatViewModel.send(prompt: userQuery) }
                     } label: {
                         SharedIcon(systemName: "paperplane.circle.fill")
                     }

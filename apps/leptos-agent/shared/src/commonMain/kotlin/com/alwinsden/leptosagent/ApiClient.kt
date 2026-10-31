@@ -43,12 +43,14 @@ class ApiClient(
     suspend fun submitConversationStream(
         request: ConversationSubmitRequest,
         onToken: (ConversationSubmitResponse) -> Unit,
+        requestPassed: () -> Unit
     ) {
         client.preparePost("$baseUrl/premium/submit") {
             contentType(ContentType.Application.Json)
             accept(ContentType.Text.EventStream)
             setBody(request)
         }.execute { response ->
+            requestPassed()
             val channel = response.bodyAsChannel()
             while (!channel.isClosedForRead) {
                 val line = channel.readLine() ?: break
@@ -58,7 +60,7 @@ class ApiClient(
                 try {
                     onToken(json.decodeFromString<ConversationSubmitResponse>(payload))
                 } catch (_: SerializationException) {
-                    
+
                 }
             }
         }
