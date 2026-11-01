@@ -11,6 +11,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -19,6 +20,7 @@ import (
 	"strings"
 
 	"github.com/getkin/kin-openapi/openapi3"
+	"github.com/oapi-codegen/runtime"
 )
 
 // ConversationSubmitRequest defines model for ConversationSubmitRequest.
@@ -43,11 +45,27 @@ type HealthResponse struct {
 	Status string `json:"status"`
 }
 
+// ModelInfo defines model for ModelInfo.
+type ModelInfo struct {
+	Id   string  `json:"id"`
+	Name *string `json:"name,omitempty"`
+}
+
+// ModelsListing defines model for ModelsListing.
+type ModelsListing struct {
+	Models []ModelInfo `json:"models"`
+}
+
 // BadRequest defines model for BadRequest.
 type BadRequest = ErrorResponse
 
 // InternalServerError defines model for InternalServerError.
 type InternalServerError = ErrorResponse
+
+// GetModelListingAPIParams defines parameters for GetModelListingAPI.
+type GetModelListingAPIParams struct {
+	Provider string `form:"provider" json:"provider"`
+}
 
 // PremiumApiJSONRequestBody defines body for PremiumApi for application/json ContentType.
 type PremiumApiJSONRequestBody = ConversationSubmitRequest
@@ -57,6 +75,9 @@ type ServerInterface interface {
 
 	// (GET /health)
 	GetHealth(w http.ResponseWriter, r *http.Request)
+
+	// (GET /models/listing)
+	GetModelListingAPI(w http.ResponseWriter, r *http.Request, params GetModelListingAPIParams)
 
 	// (POST /premium/submit)
 	PremiumApi(w http.ResponseWriter, r *http.Request)
@@ -76,6 +97,39 @@ func (siw *ServerInterfaceWrapper) GetHealth(w http.ResponseWriter, r *http.Requ
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.GetHealth(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetModelListingAPI operation middleware
+func (siw *ServerInterfaceWrapper) GetModelListingAPI(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetModelListingAPIParams
+
+	// ------------- Required query parameter "provider" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "provider", r.URL.Query(), &params.Provider, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "provider"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "provider", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetModelListingAPI(w, r, params)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -221,6 +275,7 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/health", wrapper.GetHealth)
 	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/premium/submit", wrapper.PremiumApi)
+	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/models/listing", wrapper.GetModelListingAPI)
 
 	return m
 }
@@ -239,6 +294,28 @@ type GetHealthResponseObject interface {
 type GetHealth200JSONResponse HealthResponse
 
 func (response GetHealth200JSONResponse) VisitGetHealthResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetModelListingAPIRequestObject struct {
+	Params GetModelListingAPIParams
+}
+
+type GetModelListingAPIResponseObject interface {
+	VisitGetModelListingAPIResponse(w http.ResponseWriter) error
+}
+
+type GetModelListingAPI200JSONResponse ModelsListing
+
+func (response GetModelListingAPI200JSONResponse) VisitGetModelListingAPIResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(response); err != nil {
@@ -337,6 +414,9 @@ type StrictServerInterface interface {
 	// (GET /health)
 	GetHealth(ctx context.Context, request GetHealthRequestObject) (GetHealthResponseObject, error)
 
+	// (GET /models/listing)
+	GetModelListingAPI(ctx context.Context, request GetModelListingAPIRequestObject) (GetModelListingAPIResponseObject, error)
+
 	// (POST /premium/submit)
 	PremiumApi(ctx context.Context, request PremiumApiRequestObject) (PremiumApiResponseObject, error)
 }
@@ -404,6 +484,32 @@ func (sh *strictHandler) GetHealth(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// GetModelListingAPI operation middleware
+func (sh *strictHandler) GetModelListingAPI(w http.ResponseWriter, r *http.Request, params GetModelListingAPIParams) {
+	var request GetModelListingAPIRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetModelListingAPI(ctx, request.(GetModelListingAPIRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetModelListingAPI")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetModelListingAPIResponseObject); ok {
+		if err := validResponse.VisitGetModelListingAPIResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
 // PremiumApi operation middleware
 func (sh *strictHandler) PremiumApi(w http.ResponseWriter, r *http.Request) {
 	var request PremiumApiRequestObject
@@ -440,15 +546,17 @@ func (sh *strictHandler) PremiumApi(w http.ResponseWriter, r *http.Request) {
 // const string: with thousands of chunks the chained `+` fold is several
 // times slower for the Go compiler than parsing a slice literal.
 var swaggerSpec = []string{
-	"vJRBb9s8DIb/isHvO7qRt25AoVs7dFtuRXsselBtNlYhS5pIBysC/fdBktMli7MMWLGbbFF8H74UtYHW",
-	"Dd5ZtEwgNxCQvLOE+eNKdbf4bUTi9NU6y2jzUnlvdKtYOyueydn0j9oeB5VW/wd8Agn/iZ+pRdklcR2C",
-	"C7eTCMQYa+iQ2qB9SgYSlnatjO6qUIQrr16MUx3EGpaWMVhl7jCsMeRM/47rswuVngAqygQVZoQUO6VJ",
-	"Kp+cXWOgDHE3Pg6adzz0wXkMrIu/g+vQpAW/eAQJxEHbVSrVBzd4ntmKNSRndMAO5P2U4TX+od7Gu8dn",
-	"bDmlmuOZyjwEQiK1wlmk8uMUULujtuxgOjbHte/4AQpu2/t7vRI2l/8rKsP9cQFixSOdVpjiDiVSoLZP",
-	"LqfQbNKeQc+OztQKLVeXN0uoIdlRrlCzeLdoEprzaJXXIOF80SzOU/8U95lF9Bk7LVeYL0Bi3top4Qty",
-	"KQzq/Vl93zRvNgy/WDczDWkEdYtVoc2VxhwmfMBBj4OgfNWy7Y5mCrkpcZdeQ/Ebia9c9/JmRRyfw7jf",
-	"Yg4jxpNuMn5ngWu0fEYcUA1/R3Lc2uukUU0asYYPTXNM4BVZ7LzUsYaPf3Jk7jWNpYnleSOQ9xsYgwEJ",
-	"PbOXQhjXKtM7YnnRXDQQH+KPAQA=",
+	"vFVPT9w+EP0q0fx+x7AJpZVQblDRdqVWQnBEHEwy7Bo5thlPVl0hf/fKfxYW8HaRSntz4vG8N2+exw/Q",
+	"m9EajZoddA9A6KzRDuPHqRgu8H5Cx+GrN5pRx6WwVslesDS6uXNGh3+uX+Iowup/wlvo4L/mKXWTdl1z",
+	"RmToIoOA976GAV1P0oZk0MFcr4SSQ0UJuLJirYwYwNcw14ykhbpEWiHFTP+O1xdDlcwEKhcZVBgphNic",
+	"JqB8NnqF5CKJy+lmlLyloSVjkVgmfUczoAoLXluEDhyT1ItQqiUzWi5s+RqCMpJwgO4qZ3iMv6438ebm",
+	"DnsOqUp8cpmvCaFzYoFFSunHPkL9Ftp8gHysxOu54q+o4Ka9v8dLYaX831AoXu4GcCx4cvsRclwJ4kdQ",
+	"f65vzevsciiKqMX4BhHlsBvOfZeOw6GymxI44+j2Of6J/GNzQRCJddlkJQVCoMzls2QV9hRaNu5ALFBz",
+	"dXI+hxqCIdIlameHs8OAZyxqYSV0cDRrZ0fBwYKXkXOzjI0LywXGKxCK3Biqg6/IqbVQP59WH9r23cbB",
+	"C/MU5kEYQrLHKrGNlfoY1iS5GvXUp111xBbkfiaprCAxIiM56K4eQAak+wlpDRvvhKav5IAE201imrDe",
+	"qu2lv67/olbPbVmQ6mQlpBI3CqvspCyUJRzlNDYuTqVoaOMKSp2nuBMrc83o+NQM63erYPfI9t6/lNnv",
+	"lZLxJze4Qs0HjgnF+GdMdnvwLGBUGcPX8LFtdwE8Um62HnVfw6e3HCk9vD41Mb2Eya0TKehgyWy7plGm",
+	"F2ppHHfH7XEL/tr/GgA=",
 }
 
 // decodeSpec returns the embedded OpenAPI spec as raw JSON bytes,

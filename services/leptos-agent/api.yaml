@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: leptos-agent API
-  version: 0.1.0
+  version: 0.1.1
 servers:
   - url: http://localhost:8080
 paths:
@@ -35,6 +35,22 @@ paths:
             text/event-stream:
               schema:
                 $ref: "#/components/schemas/ConversationSubmitResponse"
+  /models/listing:
+    get:
+      operationId: getModelListingAPI
+      parameters:
+        - name: provider
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Available models
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ModelsListing"
 components:
   schemas:
     ErrorResponse:
@@ -70,6 +86,24 @@ components:
         type:
           type: string
         message:
+          type: string
+    ModelsListing:
+      type: object
+      required:
+        - models
+      properties:
+        models:
+          type: array
+          items:
+            $ref: "#/components/schemas/ModelInfo"
+    ModelInfo:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+        name:
           type: string
   responses:
     BadRequest:

@@ -53,6 +53,10 @@ func (s *Server) PremiumApi(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (s *Server) GetModelListingAPI(w http.ResponseWriter, r *http.Request, GetModelListingAPIParams commonstructs.GetModelListingAPIParams) {
+
+}
+
 func main() {
 	mux := http.NewServeMux()
 	err := godotenv.Load()
