@@ -47,8 +47,8 @@ type HealthResponse struct {
 
 // ModelInfo defines model for ModelInfo.
 type ModelInfo struct {
-	Id   string  `json:"id"`
-	Name *string `json:"name,omitempty"`
+	Id   string `json:"id"`
+	Name string `json:"name"`
 }
 
 // ModelsListing defines model for ModelsListing.
@@ -551,12 +551,12 @@ var swaggerSpec = []string{
 	"RmToIoOA976GAV1P0oZk0MFcr4SSQ0UJuLJirYwYwNcw14ykhbpEWiHFTP+O1xdDlcwEKhcZVBgphNic",
 	"JqB8NnqF5CKJy+lmlLyloSVjkVgmfUczoAoLXluEDhyT1ItQqiUzWi5s+RqCMpJwgO4qZ3iMv6438ebm",
 	"DnsOqUp8cpmvCaFzYoFFSunHPkL9Ftp8gHysxOu54q+o4Ka9v8dLYaX831AoXu4GcCx4cvsRclwJ4kdQ",
-	"f65vzevsciiKqMX4BhHlsBvOfZeOw6GymxI44+j2Of6J/GNzQRCJddlkJQVCoMzls2QV9hRaNu5ALFBz",
-	"dXI+hxqCIdIlameHs8OAZyxqYSV0cDRrZ0fBwYKXkXOzjI0LywXGKxCK3Biqg6/IqbVQP59WH9r23cbB",
-	"C/MU5kEYQrLHKrGNlfoY1iS5GvXUp111xBbkfiaprCAxIiM56K4eQAak+wlpDRvvhKav5IAE201imrDe",
-	"qu2lv67/olbPbVmQ6mQlpBI3CqvspCyUJRzlNDYuTqVoaOMKSp2nuBMrc83o+NQM63erYPfI9t6/lNnv",
-	"lZLxJze4Qs0HjgnF+GdMdnvwLGBUGcPX8LFtdwE8Um62HnVfw6e3HCk9vD41Mb2Eya0TKehgyWy7plGm",
-	"F2ppHHfH7XEL/tr/GgA=",
+	"f65vzevsciiKqMX4BhHlADl0J6r7Lh2Hs2VTJQ6Mo9tn/KcaHnsMgkisy14rCRECZVaBJauwp9CycQdi",
+	"gZqrk/M51BB8ke5SOzucHQY8Y1ELK6GDo1k7OwpGFryMnJtl7F9YLjDehFDkxlcdfEVOHYb6+dD60Lbv",
+	"NhVeeKgwFsIskj1WiW2s1MewJsnVqKc+7aojtiD3M0llBYkRGclBd/UAMiDdT0jrjS+60PSVHJBgu0lM",
+	"E9Zbtb202fVf1Oq5LQtSnayEVOJGYZWdlIWyhKOcxsbF4RQNbVxBqfMUd2Jlrhkdn5ph/W4V7J7c3vuX",
+	"Mvu9UjL+5AZXqPnAMaEY/4zJbg+eBYwqY/gaPrbtLoBHys3W2+5r+PSWI6X316cmpgcxuXUiBR0smW3X",
+	"NMr0Qi2N4+64PW7BX/tfAwA=",
 }
 
 // decodeSpec returns the embedded OpenAPI spec as raw JSON bytes,

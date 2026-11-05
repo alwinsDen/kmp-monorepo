@@ -30,6 +30,18 @@ func GetMachineResponse(userQuery string, channel chan commonstructs.SSEChannelS
 					Role:    components.ChatUserMessageRoleUser,
 				},
 			),
+			components.CreateChatMessagesSystem(
+				components.ChatSystemMessage{
+					Content: components.CreateChatSystemMessageContentStr(`
+						Formatting rules:
+						- Never use markdown headings (#, ##, ###, etc.) anywhere in your response.
+						- Do not begin any line with '#' characters.
+						- Keep responses in plain prose; use short paragraphs and, when useful, "-" bullet lists.
+						- Maximum heading substitute: a bold short line like "**Summary**" is allowed.
+					`),
+					Role: components.ChatSystemMessageRoleSystem,
+				},
+			),
 		},
 		Stream: new(true),
 	}, nil)

@@ -53,8 +53,11 @@ func (s *Server) PremiumApi(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s *Server) GetModelListingAPI(w http.ResponseWriter, r *http.Request, GetModelListingAPIParams commonstructs.GetModelListingAPIParams) {
-
+func (s *Server) GetModelListingAPI(w http.ResponseWriter, r *http.Request, modelParams GetModelListingAPIParams) {
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(GetModelListingAPI200JSONResponse{Models: []ModelInfo{
+		{Name: "Hi there", Id: "testID1"},
+	}})
 }
 
 func main() {

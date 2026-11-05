@@ -8,13 +8,13 @@ tmp_dir = "tmp"
 [build]
   args_bin = []
   bin = ""
-  cmd = "make go-types && go build -o ./tmp/${AIR_SERVICE} ./services/${AIR_SERVICE}"
+  cmd = "make go-types SERVICE=${AIR_SERVICE} && go build -o ./tmp/${AIR_SERVICE} ./services/${AIR_SERVICE}"
   delay = 1000
   entrypoint = []
-  exclude_dir = ["apps", "shared", "tmp", "vendor", "testdata", "node_modules"]
+  exclude_dir = ["apps", "shared", "tmp", "vendor", "testdata", "node_modules", "services/leptos-agent/ent"]
   exclude_file = ["services/leptos-agent/gen.go"]
   exclude_regex = ["_test.go"]
-  exclude_unchanged = false
+  exclude_unchanged = true
   follow_symlink = false
   full_bin = "sh -c 'exec ./tmp/${AIR_SERVICE}'"
   ignore_dangerous_root_dir = false
