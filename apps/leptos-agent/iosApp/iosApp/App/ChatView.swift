@@ -17,7 +17,6 @@ struct ContentView: View {
     @FocusState private var isChatInputInFocus: Bool
     @State private var selectedUsageModel: SelectedModelTypes?
 
-
     private func scrollToBottom(_ proxy: ScrollViewProxy) {
         if let last = chatViewModel.chatArray.last {
             withAnimation(.easeOut(duration: 0.15)) {
@@ -38,51 +37,67 @@ struct ContentView: View {
                                     VStack {
                                         Text(arrayDetails.text)
                                     }.padding(16)
-                                        .background(.ultraThinMaterial, in: .rect(cornerRadius: 24))
+                                        .background(
+                                            .ultraThinMaterial,
+                                            in: .rect(cornerRadius: 24)
+                                        )
                                 }.id(arrayDetails.id)
                                     .padding(.trailing, 16)
                                     .padding(.bottom, 8)
                             }
-                            if !chatViewModel.transcriptResponse.isEmpty && !arrayDetails.isUser {
+                            if !chatViewModel.transcriptResponse.isEmpty
+                                && !arrayDetails.isUser
+                            {
                                 VStack {
-                                    StructuredText(markdown: arrayDetails.text)
-                                }.frame(maxWidth: .infinity, alignment: .leading)
-                                    .padding(.horizontal, 12)
-                                    .padding(.bottom, 8)
+                                    StructuredText(
+                                        markdown: arrayDetails.text
+                                    )
+                                }.frame(
+                                    maxWidth: .infinity,
+                                    alignment: .leading
+                                )
+                                .padding(.horizontal, 12)
+                                .padding(.bottom, 8)
                             }
                         }
+                        if chatViewModel.sendPhaseState == .connecting {
+                            HStack {
+                                //RunLottie(fileName: "loader_cat", size: 64)
+                                //Text("leptos at work...")
+                                //Spacer()
+                                ProgressView()
+                                    .progressViewStyle(.circular)
+                                    .controlSize(.regular)
+                                Text("leptos at work...")
+                                    .phaseAnimator([0.15, 1.0, 1.0]) {
+                                        text,
+                                        opacity in
+                                        text.opacity(opacity)
+                                    } animation: { _ in
+                                        .easeInOut(duration: 0.7)
+                                    }
+                                Spacer()
+                            }.padding(.vertical, 0)
+                                .padding(.horizontal, 12)
+                        }
                     }
-                    if chatViewModel.sendPhaseState == .connecting {
-                        HStack {
-                            //RunLottie(fileName: "loader_cat", size: 64)
-                            //Text("leptos at work...")
-                            //Spacer()
-                            ProgressView()
-                                .progressViewStyle(.circular)
-                                .controlSize(.regular)
-                            Text("leptos at work...")
-                                .phaseAnimator([0.15, 1.0, 1.0]) { text, opacity in
-                                    text.opacity(opacity)
-                                } animation: { _ in
-                                    .easeInOut(duration: 0.7)
-                                }
-                            Spacer()
-                        }.padding(.vertical, 0)
-                            .padding(.horizontal, 12)
+                    .ignoresSafeArea(.keyboard, edges: .bottom)
+                    .scrollDismissesKeyboard(.immediately)
+                    .padding(.leading, 10)
+                    .onChange(of: chatViewModel.chatArray.count) { _, _ in
+                        scrollToBottom(proxy)
                     }
-                }
-                .ignoresSafeArea(.keyboard, edges: .bottom)
-                .scrollDismissesKeyboard(.immediately)
-                .padding(.leading, 10)
-                .onChange(of: chatViewModel.chatArray.count) { _, _ in
-                    scrollToBottom(proxy)
                 }
             }
             VStack {
-                TextField("Ask Leptos agent...", text: $userQuery, axis: .vertical)
-                    .lineLimit(6)
-                    .multilineTextAlignment(.leading)
-                    .focused($isChatInputInFocus)
+                TextField(
+                    "Ask Leptos agent...",
+                    text: $userQuery,
+                    axis: .vertical
+                )
+                .lineLimit(6)
+                .multilineTextAlignment(.leading)
+                .focused($isChatInputInFocus)
                 Spacer().frame(height: 20)
                 HStack {
                     Menu {
@@ -110,7 +125,8 @@ struct ContentView: View {
                     Spacer().frame(width: 20)
                     Button {
                         selectedUsageModel = SelectedModelTypes(
-                            model_code: "glm5.3", provider: "openrouter"
+                            model_code: "glm5.3",
+                            provider: "openrouter"
                         )
                     } label: {
                         Text("Leptos Basic")
@@ -118,7 +134,8 @@ struct ContentView: View {
                             .padding(6)
                     }
                     .sheet(
-                        item: $selectedUsageModel, onDismiss: {},
+                        item: $selectedUsageModel,
+                        onDismiss: {},
                         content: { _ in
                             VStack {
                                 HStack {
@@ -136,7 +153,8 @@ struct ContentView: View {
                             .stroke(Color.primary.opacity(0.8), lineWidth: 0.5)
                     )
                     Spacer()
-                    Button {} label: {
+                    Button {
+                    } label: {
                         SharedIcon(systemName: "music.microphone.circle.fill")
                     }
                     .labelStyle(.iconOnly)
@@ -155,14 +173,15 @@ struct ContentView: View {
                     .labelStyle(.iconOnly)
                     .buttonStyle(.plain)
                 }
-            }.padding(12)
-                .background(.ultraThinMaterial, in: .rect(cornerRadius: 14))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 14)
-                        .stroke(Color.secondary.opacity(0.8), lineWidth: 0.5)
-                )
-                .padding(.horizontal, 15)
-                .padding(.bottom, 12)
+            }
+            .padding(12)
+            .background(.ultraThinMaterial, in: .rect(cornerRadius: 14))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .stroke(Color.secondary.opacity(0.8), lineWidth: 0.5)
+            )
+            .padding(.horizontal, 15)
+            .padding(.bottom, 12)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .task {

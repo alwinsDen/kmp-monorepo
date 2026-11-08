@@ -12,12 +12,12 @@ final class ChatViewModel: ObservableObject {
         let isUser : Bool
         var text : String
     }
-
+    
     @Published var healthStatus: String = ""
     @Published var transcriptResponse = ""
     @Published var sendPhaseState : sendPhase = .idle
     @Published var chatArray : [ChatMessage] = []
-
+    
     func checkHealth() async {
         do {
             let health = try await api.getHealth()
@@ -26,7 +26,7 @@ final class ChatViewModel: ObservableObject {
             healthStatus = "unreachable: \(error.localizedDescription)"
         }
     }
-
+    
     func send(prompt: String) async {
         guard !prompt.isEmpty else { return }
         self.sendPhaseState = .connecting
