@@ -49,9 +49,14 @@ struct ContentView: View {
                                 && !arrayDetails.isUser
                             {
                                 VStack {
-                                    StructuredText(
-                                        markdown: arrayDetails.text
-                                    )
+                                    if arrayDetails.id == chatViewModel.streamingMessageID {
+                                        StreamingRevealText(
+                                            message: arrayDetails,
+                                            revealWindow: chatViewModel.revealWindow
+                                        )
+                                    } else {
+                                        StructuredText(markdown: arrayDetails.text)
+                                    }
                                 }.frame(
                                     maxWidth: .infinity,
                                     alignment: .leading
@@ -88,6 +93,20 @@ struct ContentView: View {
                         scrollToBottom(proxy)
                     }
                 }
+                .overlay {
+                    if chatViewModel.chatArray.isEmpty {
+                        VStack(spacing: 8) {
+                            Text("Welcome, Alwin")
+                                .font(.largeTitle.weight(.bold))
+                            Text("Leptos agent is here for you")
+                                .font(.body)
+                                .foregroundStyle(.secondary)
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .transition(.opacity)
+                    }
+                }
+                .animation(.easeInOut(duration: 0.25), value: chatViewModel.chatArray.isEmpty)
             }
             VStack {
                 TextField(
@@ -188,5 +207,33 @@ struct ContentView: View {
             await chatViewModel.checkHealth()
             print("backend health: \(chatViewModel.healthStatus)")
         }
+    }
+}
+
+/// Renders a streaming message as three stacked reveal layers so newly
+/// revealed characters fade in: the newest characters sit on top at reduced
+/// opacity and solidify as the more opaque layers underneath catch up.
+/// Because every layer is a prefix of the same text, they align exactly.
+private struct StreamingRevealText: View {
+    let message: ChatViewModel.ChatMessage
+    let revealWindow: [Int]
+
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            layer(at: 2)
+            layer(at: 1)
+                .opacity(0.65)
+            layer(at: 0)
+                .opacity(0.3)
+        }
+    }
+
+    /// One reveal layer: the message text up to the reveal position 'lag'
+    /// ticks behind the newest one.
+    private func layer(at lag: Int) -> some View {
+        let count = lag < revealWindow.count
+            ? min(revealWindow[lag], message.text.count)
+            : 0
+        return StructuredText(markdown: String(message.text.prefix(count)))
     }
 }
