@@ -8,7 +8,6 @@ import (
 
 	commonstructs "github.com/alwinsden/kmp-monorepo/services/commonStructs"
 	"github.com/alwinsden/kmp-monorepo/services/leptos-agent/openrouter"
-	"github.com/joho/godotenv"
 )
 
 type Server struct {
@@ -62,10 +61,6 @@ func (s *Server) GetModelListingAPI(w http.ResponseWriter, r *http.Request, mode
 
 func main() {
 	mux := http.NewServeMux()
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file.")
-	}
 
 	/*
 		HandlerFromMux is from @api.yaml auto-generated code,
