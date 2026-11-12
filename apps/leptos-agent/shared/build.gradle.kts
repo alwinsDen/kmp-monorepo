@@ -1,3 +1,5 @@
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
+import io.github.cdimascio.dotenv.Dotenv
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -5,6 +7,7 @@ plugins {
     alias(libs.plugins.androidMultiplatformLibrary)
     alias(libs.plugins.openapiGenerator)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.buildkonfig)
 }
 
 kotlin {
@@ -78,6 +81,34 @@ tasks.openApiGenerate {
             "enumPropertyNaming" to "UPPERCASE",
         )
     )
+}
+
+abstract class ServerEndpointValueSource : ValueSource<String, ServerEndpointValueSource.Params> {
+    interface Params : ValueSourceParameters {
+        val envFile: RegularFileProperty
+    }
+
+    override fun obtain(): String {
+        val envFile = parameters.envFile.get().asFile
+        if (!envFile.exists()) return ""
+        val dotenv = Dotenv.configure()
+            .directory(envFile.parentFile.absolutePath)
+            .filename(envFile.name)
+            .ignoreIfMissing()
+            .load()
+        return dotenv["SERVER_ENDPOINT"]
+    }
+}
+
+val serverEndpoint = providers.of(ServerEndpointValueSource::class) {
+    parameters { envFile.set(rootProject.file(".env")) }
+}.get()
+
+buildkonfig {
+    packageName = "com.alwinsden.leptosagent"
+    defaultConfigs {
+        buildConfigField(STRING, "SERVER_ENDPOINT", serverEndpoint)
+    }
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask<*>>().configureEach {

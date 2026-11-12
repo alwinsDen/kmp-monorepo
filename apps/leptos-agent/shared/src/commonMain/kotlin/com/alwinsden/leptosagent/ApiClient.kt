@@ -16,7 +16,7 @@ import kotlinx.serialization.json.Json
 
 internal expect fun platformHttpClientEngine(): io.ktor.client.engine.HttpClientEngine
 
-class ApiClient(
+class kmp_ApiClient(
     private val baseUrl: String
 ) {
     private val json = Json {
@@ -26,7 +26,7 @@ class ApiClient(
 
     private val client = HttpClient(platformHttpClientEngine()) {
         install(ContentNegotiation) {
-            json(this@ApiClient.json)
+            json(this@kmp_ApiClient.json)
         }
     }
 

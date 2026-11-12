@@ -3,8 +3,8 @@ import Shared
 
 @MainActor
 final class ChatViewModel: ObservableObject {
-    private static let apiBaseUrl: String = "http://172.20.10.9:8080"
-    private let api = ApiClient(baseUrl: apiBaseUrl)
+    private static let apiBaseUrl: String = kmp_serverEndpoint().currentServerUrl()
+    private let api = kmp_ApiClient(baseUrl: apiBaseUrl)
     
     // Reveal pacing: type out text at a readable base speed, but accelerate when
     // tokens arrive faster than they are revealed so we never fall far behind.
