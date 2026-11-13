@@ -24,6 +24,9 @@ ent-schema-generator:
 migrations: 						## migration for ENT schema.
 	$(SOPS_COMMAND) 'go run ./services/$(SERVICE)/cmd/migrate'
 
+sops-decrypt:
+	go tool sops -d secrets.$(ENV).env
+
 # e.g. make run-server SERVICE=leptos-agent
 run-server:							## sops-based migration runs.
 	$(SOPS_COMMAND) 'AIR_SERVICE=$(SERVICE) go tool air'
