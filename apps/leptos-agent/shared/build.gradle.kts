@@ -96,12 +96,12 @@ abstract class ServerEndpointValueSource : ValueSource<String, ServerEndpointVal
             .filename(envFile.name)
             .ignoreIfMissing()
             .load()
-        return dotenv["SERVER_ENDPOINT"]
+        return dotenv["LEPTOS_SERVER_ENDPOINT"]
     }
 }
 
 val serverEndpoint = providers.of(ServerEndpointValueSource::class) {
-    parameters { envFile.set(rootProject.file(".env")) }
+    parameters { envFile.set(rootProject.file(".commom.env")) }
 }.get()
 
 buildkonfig {
