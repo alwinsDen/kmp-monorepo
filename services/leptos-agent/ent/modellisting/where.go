@@ -72,6 +72,16 @@ func IsSupported(v bool) predicate.ModelListing {
 	return predicate.ModelListing(sql.FieldEQ(FieldIsSupported, v))
 }
 
+// SupportsEffort applies equality check predicate on the "supports_effort" field. It's identical to SupportsEffortEQ.
+func SupportsEffort(v bool) predicate.ModelListing {
+	return predicate.ModelListing(sql.FieldEQ(FieldSupportsEffort, v))
+}
+
+// Paid applies equality check predicate on the "paid" field. It's identical to PaidEQ.
+func Paid(v bool) predicate.ModelListing {
+	return predicate.ModelListing(sql.FieldEQ(FieldPaid, v))
+}
+
 // ModelCodeEQ applies the EQ predicate on the "model_code" field.
 func ModelCodeEQ(v string) predicate.ModelListing {
 	return predicate.ModelListing(sql.FieldEQ(FieldModelCode, v))
@@ -275,6 +285,26 @@ func IsSupportedEQ(v bool) predicate.ModelListing {
 // IsSupportedNEQ applies the NEQ predicate on the "is_supported" field.
 func IsSupportedNEQ(v bool) predicate.ModelListing {
 	return predicate.ModelListing(sql.FieldNEQ(FieldIsSupported, v))
+}
+
+// SupportsEffortEQ applies the EQ predicate on the "supports_effort" field.
+func SupportsEffortEQ(v bool) predicate.ModelListing {
+	return predicate.ModelListing(sql.FieldEQ(FieldSupportsEffort, v))
+}
+
+// SupportsEffortNEQ applies the NEQ predicate on the "supports_effort" field.
+func SupportsEffortNEQ(v bool) predicate.ModelListing {
+	return predicate.ModelListing(sql.FieldNEQ(FieldSupportsEffort, v))
+}
+
+// PaidEQ applies the EQ predicate on the "paid" field.
+func PaidEQ(v bool) predicate.ModelListing {
+	return predicate.ModelListing(sql.FieldEQ(FieldPaid, v))
+}
+
+// PaidNEQ applies the NEQ predicate on the "paid" field.
+func PaidNEQ(v bool) predicate.ModelListing {
+	return predicate.ModelListing(sql.FieldNEQ(FieldPaid, v))
 }
 
 // And groups predicates with the AND operator between them.

@@ -17,6 +17,8 @@ func (ModelListing) Fields() []ent.Field {
 		field.String("provider").NotEmpty(),
 		field.String("user_readable_name").NotEmpty().MaxLen(20),
 		field.Bool("is_supported").Default(false),
+		field.Bool("supports_effort").Default(false),
+		field.Bool("paid").Default(false),
 	}
 }
 

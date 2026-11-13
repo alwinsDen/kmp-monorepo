@@ -15,6 +15,8 @@ var (
 		{Name: "provider", Type: field.TypeString},
 		{Name: "user_readable_name", Type: field.TypeString, Size: 20},
 		{Name: "is_supported", Type: field.TypeBool, Default: false},
+		{Name: "supports_effort", Type: field.TypeBool, Default: false},
+		{Name: "paid", Type: field.TypeBool, Default: false},
 	}
 	// ModelListingsTable holds the schema information for the "model_listings" table.
 	ModelListingsTable = &schema.Table{

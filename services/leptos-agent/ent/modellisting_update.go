@@ -83,6 +83,34 @@ func (_u *ModelListingUpdate) SetNillableIsSupported(v *bool) *ModelListingUpdat
 	return _u
 }
 
+// SetSupportsEffort sets the "supports_effort" field.
+func (_u *ModelListingUpdate) SetSupportsEffort(v bool) *ModelListingUpdate {
+	_u.mutation.SetSupportsEffort(v)
+	return _u
+}
+
+// SetNillableSupportsEffort sets the "supports_effort" field if the given value is not nil.
+func (_u *ModelListingUpdate) SetNillableSupportsEffort(v *bool) *ModelListingUpdate {
+	if v != nil {
+		_u.SetSupportsEffort(*v)
+	}
+	return _u
+}
+
+// SetPaid sets the "paid" field.
+func (_u *ModelListingUpdate) SetPaid(v bool) *ModelListingUpdate {
+	_u.mutation.SetPaid(v)
+	return _u
+}
+
+// SetNillablePaid sets the "paid" field if the given value is not nil.
+func (_u *ModelListingUpdate) SetNillablePaid(v *bool) *ModelListingUpdate {
+	if v != nil {
+		_u.SetPaid(*v)
+	}
+	return _u
+}
+
 // Mutation returns the ModelListingMutation object of the builder.
 func (_u *ModelListingUpdate) Mutation() *ModelListingMutation {
 	return _u.mutation
@@ -159,6 +187,12 @@ func (_u *ModelListingUpdate) sqlSave(ctx context.Context) (_node int, err error
 	if value, ok := _u.mutation.IsSupported(); ok {
 		_spec.SetField(modellisting.FieldIsSupported, field.TypeBool, value)
 	}
+	if value, ok := _u.mutation.SupportsEffort(); ok {
+		_spec.SetField(modellisting.FieldSupportsEffort, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.Paid(); ok {
+		_spec.SetField(modellisting.FieldPaid, field.TypeBool, value)
+	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{modellisting.Label}
@@ -231,6 +265,34 @@ func (_u *ModelListingUpdateOne) SetIsSupported(v bool) *ModelListingUpdateOne {
 func (_u *ModelListingUpdateOne) SetNillableIsSupported(v *bool) *ModelListingUpdateOne {
 	if v != nil {
 		_u.SetIsSupported(*v)
+	}
+	return _u
+}
+
+// SetSupportsEffort sets the "supports_effort" field.
+func (_u *ModelListingUpdateOne) SetSupportsEffort(v bool) *ModelListingUpdateOne {
+	_u.mutation.SetSupportsEffort(v)
+	return _u
+}
+
+// SetNillableSupportsEffort sets the "supports_effort" field if the given value is not nil.
+func (_u *ModelListingUpdateOne) SetNillableSupportsEffort(v *bool) *ModelListingUpdateOne {
+	if v != nil {
+		_u.SetSupportsEffort(*v)
+	}
+	return _u
+}
+
+// SetPaid sets the "paid" field.
+func (_u *ModelListingUpdateOne) SetPaid(v bool) *ModelListingUpdateOne {
+	_u.mutation.SetPaid(v)
+	return _u
+}
+
+// SetNillablePaid sets the "paid" field if the given value is not nil.
+func (_u *ModelListingUpdateOne) SetNillablePaid(v *bool) *ModelListingUpdateOne {
+	if v != nil {
+		_u.SetPaid(*v)
 	}
 	return _u
 }
@@ -340,6 +402,12 @@ func (_u *ModelListingUpdateOne) sqlSave(ctx context.Context) (_node *ModelListi
 	}
 	if value, ok := _u.mutation.IsSupported(); ok {
 		_spec.SetField(modellisting.FieldIsSupported, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.SupportsEffort(); ok {
+		_spec.SetField(modellisting.FieldSupportsEffort, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.Paid(); ok {
+		_spec.SetField(modellisting.FieldPaid, field.TypeBool, value)
 	}
 	_node = &ModelListing{config: _u.config}
 	_spec.Assign = _node.assignValues

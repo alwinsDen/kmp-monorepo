@@ -23,7 +23,11 @@ type ModelListing struct {
 	// UserReadableName holds the value of the "user_readable_name" field.
 	UserReadableName string `json:"user_readable_name,omitempty"`
 	// IsSupported holds the value of the "is_supported" field.
-	IsSupported  bool `json:"is_supported,omitempty"`
+	IsSupported bool `json:"is_supported,omitempty"`
+	// SupportsEffort holds the value of the "supports_effort" field.
+	SupportsEffort bool `json:"supports_effort,omitempty"`
+	// Paid holds the value of the "paid" field.
+	Paid         bool `json:"paid,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -32,7 +36,7 @@ func (*ModelListing) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case modellisting.FieldIsSupported:
+		case modellisting.FieldIsSupported, modellisting.FieldSupportsEffort, modellisting.FieldPaid:
 			values[i] = new(sql.NullBool)
 		case modellisting.FieldID:
 			values[i] = new(sql.NullInt64)
@@ -83,6 +87,18 @@ func (_m *ModelListing) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.IsSupported = value.Bool
 			}
+		case modellisting.FieldSupportsEffort:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field supports_effort", values[i])
+			} else if value.Valid {
+				_m.SupportsEffort = value.Bool
+			}
+		case modellisting.FieldPaid:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field paid", values[i])
+			} else if value.Valid {
+				_m.Paid = value.Bool
+			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
 		}
@@ -130,6 +146,12 @@ func (_m *ModelListing) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("is_supported=")
 	builder.WriteString(fmt.Sprintf("%v", _m.IsSupported))
+	builder.WriteString(", ")
+	builder.WriteString("supports_effort=")
+	builder.WriteString(fmt.Sprintf("%v", _m.SupportsEffort))
+	builder.WriteString(", ")
+	builder.WriteString("paid=")
+	builder.WriteString(fmt.Sprintf("%v", _m.Paid))
 	builder.WriteByte(')')
 	return builder.String()
 }

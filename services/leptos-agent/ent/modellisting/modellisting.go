@@ -19,6 +19,10 @@ const (
 	FieldUserReadableName = "user_readable_name"
 	// FieldIsSupported holds the string denoting the is_supported field in the database.
 	FieldIsSupported = "is_supported"
+	// FieldSupportsEffort holds the string denoting the supports_effort field in the database.
+	FieldSupportsEffort = "supports_effort"
+	// FieldPaid holds the string denoting the paid field in the database.
+	FieldPaid = "paid"
 	// Table holds the table name of the modellisting in the database.
 	Table = "model_listings"
 )
@@ -30,6 +34,8 @@ var Columns = []string{
 	FieldProvider,
 	FieldUserReadableName,
 	FieldIsSupported,
+	FieldSupportsEffort,
+	FieldPaid,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -51,6 +57,10 @@ var (
 	UserReadableNameValidator func(string) error
 	// DefaultIsSupported holds the default value on creation for the "is_supported" field.
 	DefaultIsSupported bool
+	// DefaultSupportsEffort holds the default value on creation for the "supports_effort" field.
+	DefaultSupportsEffort bool
+	// DefaultPaid holds the default value on creation for the "paid" field.
+	DefaultPaid bool
 )
 
 // OrderOption defines the ordering options for the ModelListing queries.
@@ -79,4 +89,14 @@ func ByUserReadableName(opts ...sql.OrderTermOption) OrderOption {
 // ByIsSupported orders the results by the is_supported field.
 func ByIsSupported(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldIsSupported, opts...).ToFunc()
+}
+
+// BySupportsEffort orders the results by the supports_effort field.
+func BySupportsEffort(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSupportsEffort, opts...).ToFunc()
+}
+
+// ByPaid orders the results by the paid field.
+func ByPaid(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPaid, opts...).ToFunc()
 }

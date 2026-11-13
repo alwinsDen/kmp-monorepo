@@ -51,6 +51,34 @@ func (_c *ModelListingCreate) SetNillableIsSupported(v *bool) *ModelListingCreat
 	return _c
 }
 
+// SetSupportsEffort sets the "supports_effort" field.
+func (_c *ModelListingCreate) SetSupportsEffort(v bool) *ModelListingCreate {
+	_c.mutation.SetSupportsEffort(v)
+	return _c
+}
+
+// SetNillableSupportsEffort sets the "supports_effort" field if the given value is not nil.
+func (_c *ModelListingCreate) SetNillableSupportsEffort(v *bool) *ModelListingCreate {
+	if v != nil {
+		_c.SetSupportsEffort(*v)
+	}
+	return _c
+}
+
+// SetPaid sets the "paid" field.
+func (_c *ModelListingCreate) SetPaid(v bool) *ModelListingCreate {
+	_c.mutation.SetPaid(v)
+	return _c
+}
+
+// SetNillablePaid sets the "paid" field if the given value is not nil.
+func (_c *ModelListingCreate) SetNillablePaid(v *bool) *ModelListingCreate {
+	if v != nil {
+		_c.SetPaid(*v)
+	}
+	return _c
+}
+
 // Mutation returns the ModelListingMutation object of the builder.
 func (_c *ModelListingCreate) Mutation() *ModelListingMutation {
 	return _c.mutation
@@ -90,6 +118,14 @@ func (_c *ModelListingCreate) defaults() {
 		v := modellisting.DefaultIsSupported
 		_c.mutation.SetIsSupported(v)
 	}
+	if _, ok := _c.mutation.SupportsEffort(); !ok {
+		v := modellisting.DefaultSupportsEffort
+		_c.mutation.SetSupportsEffort(v)
+	}
+	if _, ok := _c.mutation.Paid(); !ok {
+		v := modellisting.DefaultPaid
+		_c.mutation.SetPaid(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -120,6 +156,12 @@ func (_c *ModelListingCreate) check() error {
 	}
 	if _, ok := _c.mutation.IsSupported(); !ok {
 		return &ValidationError{Name: "is_supported", err: errors.New(`ent: missing required field "ModelListing.is_supported"`)}
+	}
+	if _, ok := _c.mutation.SupportsEffort(); !ok {
+		return &ValidationError{Name: "supports_effort", err: errors.New(`ent: missing required field "ModelListing.supports_effort"`)}
+	}
+	if _, ok := _c.mutation.Paid(); !ok {
+		return &ValidationError{Name: "paid", err: errors.New(`ent: missing required field "ModelListing.paid"`)}
 	}
 	return nil
 }
@@ -162,6 +204,14 @@ func (_c *ModelListingCreate) createSpec() (*ModelListing, *sqlgraph.CreateSpec)
 	if value, ok := _c.mutation.IsSupported(); ok {
 		_spec.SetField(modellisting.FieldIsSupported, field.TypeBool, value)
 		_node.IsSupported = value
+	}
+	if value, ok := _c.mutation.SupportsEffort(); ok {
+		_spec.SetField(modellisting.FieldSupportsEffort, field.TypeBool, value)
+		_node.SupportsEffort = value
+	}
+	if value, ok := _c.mutation.Paid(); ok {
+		_spec.SetField(modellisting.FieldPaid, field.TypeBool, value)
+		_node.Paid = value
 	}
 	return _node, _spec
 }

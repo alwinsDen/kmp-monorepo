@@ -57,4 +57,12 @@ func init() {
 	modellistingDescIsSupported := modellistingFields[3].Descriptor()
 	// modellisting.DefaultIsSupported holds the default value on creation for the is_supported field.
 	modellisting.DefaultIsSupported = modellistingDescIsSupported.Default.(bool)
+	// modellistingDescSupportsEffort is the schema descriptor for supports_effort field.
+	modellistingDescSupportsEffort := modellistingFields[4].Descriptor()
+	// modellisting.DefaultSupportsEffort holds the default value on creation for the supports_effort field.
+	modellisting.DefaultSupportsEffort = modellistingDescSupportsEffort.Default.(bool)
+	// modellistingDescPaid is the schema descriptor for paid field.
+	modellistingDescPaid := modellistingFields[5].Descriptor()
+	// modellisting.DefaultPaid holds the default value on creation for the paid field.
+	modellisting.DefaultPaid = modellistingDescPaid.Default.(bool)
 }

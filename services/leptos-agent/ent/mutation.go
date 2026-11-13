@@ -36,6 +36,8 @@ type ModelListingMutation struct {
 	provider           *string
 	user_readable_name *string
 	is_supported       *bool
+	supports_effort    *bool
+	paid               *bool
 	clearedFields      map[string]struct{}
 	done               bool
 	oldValue           func(context.Context) (*ModelListing, error)
@@ -284,6 +286,78 @@ func (m *ModelListingMutation) ResetIsSupported() {
 	m.is_supported = nil
 }
 
+// SetSupportsEffort sets the "supports_effort" field.
+func (m *ModelListingMutation) SetSupportsEffort(b bool) {
+	m.supports_effort = &b
+}
+
+// SupportsEffort returns the value of the "supports_effort" field in the mutation.
+func (m *ModelListingMutation) SupportsEffort() (r bool, exists bool) {
+	v := m.supports_effort
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSupportsEffort returns the old "supports_effort" field's value of the ModelListing entity.
+// If the ModelListing object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ModelListingMutation) OldSupportsEffort(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSupportsEffort is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSupportsEffort requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSupportsEffort: %w", err)
+	}
+	return oldValue.SupportsEffort, nil
+}
+
+// ResetSupportsEffort resets all changes to the "supports_effort" field.
+func (m *ModelListingMutation) ResetSupportsEffort() {
+	m.supports_effort = nil
+}
+
+// SetPaid sets the "paid" field.
+func (m *ModelListingMutation) SetPaid(b bool) {
+	m.paid = &b
+}
+
+// Paid returns the value of the "paid" field in the mutation.
+func (m *ModelListingMutation) Paid() (r bool, exists bool) {
+	v := m.paid
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPaid returns the old "paid" field's value of the ModelListing entity.
+// If the ModelListing object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ModelListingMutation) OldPaid(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPaid is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPaid requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPaid: %w", err)
+	}
+	return oldValue.Paid, nil
+}
+
+// ResetPaid resets all changes to the "paid" field.
+func (m *ModelListingMutation) ResetPaid() {
+	m.paid = nil
+}
+
 // Where appends a list predicates to the ModelListingMutation builder.
 func (m *ModelListingMutation) Where(ps ...predicate.ModelListing) {
 	m.predicates = append(m.predicates, ps...)
@@ -318,7 +392,7 @@ func (m *ModelListingMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ModelListingMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 6)
 	if m.model_code != nil {
 		fields = append(fields, modellisting.FieldModelCode)
 	}
@@ -330,6 +404,12 @@ func (m *ModelListingMutation) Fields() []string {
 	}
 	if m.is_supported != nil {
 		fields = append(fields, modellisting.FieldIsSupported)
+	}
+	if m.supports_effort != nil {
+		fields = append(fields, modellisting.FieldSupportsEffort)
+	}
+	if m.paid != nil {
+		fields = append(fields, modellisting.FieldPaid)
 	}
 	return fields
 }
@@ -347,6 +427,10 @@ func (m *ModelListingMutation) Field(name string) (ent.Value, bool) {
 		return m.UserReadableName()
 	case modellisting.FieldIsSupported:
 		return m.IsSupported()
+	case modellisting.FieldSupportsEffort:
+		return m.SupportsEffort()
+	case modellisting.FieldPaid:
+		return m.Paid()
 	}
 	return nil, false
 }
@@ -364,6 +448,10 @@ func (m *ModelListingMutation) OldField(ctx context.Context, name string) (ent.V
 		return m.OldUserReadableName(ctx)
 	case modellisting.FieldIsSupported:
 		return m.OldIsSupported(ctx)
+	case modellisting.FieldSupportsEffort:
+		return m.OldSupportsEffort(ctx)
+	case modellisting.FieldPaid:
+		return m.OldPaid(ctx)
 	}
 	return nil, fmt.Errorf("unknown ModelListing field %s", name)
 }
@@ -400,6 +488,20 @@ func (m *ModelListingMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetIsSupported(v)
+		return nil
+	case modellisting.FieldSupportsEffort:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSupportsEffort(v)
+		return nil
+	case modellisting.FieldPaid:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPaid(v)
 		return nil
 	}
 	return fmt.Errorf("unknown ModelListing field %s", name)
@@ -461,6 +563,12 @@ func (m *ModelListingMutation) ResetField(name string) error {
 		return nil
 	case modellisting.FieldIsSupported:
 		m.ResetIsSupported()
+		return nil
+	case modellisting.FieldSupportsEffort:
+		m.ResetSupportsEffort()
+		return nil
+	case modellisting.FieldPaid:
+		m.ResetPaid()
 		return nil
 	}
 	return fmt.Errorf("unknown ModelListing field %s", name)
