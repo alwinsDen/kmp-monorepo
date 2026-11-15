@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -27,7 +28,9 @@ type ModelListing struct {
 	// SupportsEffort holds the value of the "supports_effort" field.
 	SupportsEffort bool `json:"supports_effort,omitempty"`
 	// Paid holds the value of the "paid" field.
-	Paid         bool `json:"paid,omitempty"`
+	Paid bool `json:"paid,omitempty"`
+	// EffortTypes holds the value of the "effort_types" field.
+	EffortTypes  []string `json:"effort_types,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -36,6 +39,8 @@ func (*ModelListing) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case modellisting.FieldEffortTypes:
+			values[i] = new([]byte)
 		case modellisting.FieldIsSupported, modellisting.FieldSupportsEffort, modellisting.FieldPaid:
 			values[i] = new(sql.NullBool)
 		case modellisting.FieldID:
@@ -99,6 +104,14 @@ func (_m *ModelListing) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.Paid = value.Bool
 			}
+		case modellisting.FieldEffortTypes:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field effort_types", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &_m.EffortTypes); err != nil {
+					return fmt.Errorf("unmarshal field effort_types: %w", err)
+				}
+			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
 		}
@@ -152,6 +165,9 @@ func (_m *ModelListing) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("paid=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Paid))
+	builder.WriteString(", ")
+	builder.WriteString("effort_types=")
+	builder.WriteString(fmt.Sprintf("%v", _m.EffortTypes))
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -17,6 +17,7 @@ var (
 		{Name: "is_supported", Type: field.TypeBool, Default: false},
 		{Name: "supports_effort", Type: field.TypeBool, Default: false},
 		{Name: "paid", Type: field.TypeBool, Default: false},
+		{Name: "effort_types", Type: field.TypeJSON},
 	}
 	// ModelListingsTable holds the schema information for the "model_listings" table.
 	ModelListingsTable = &schema.Table{

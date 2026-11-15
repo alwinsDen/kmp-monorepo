@@ -38,6 +38,8 @@ type ModelListingMutation struct {
 	is_supported       *bool
 	supports_effort    *bool
 	paid               *bool
+	effort_types       *[]string
+	appendeffort_types []string
 	clearedFields      map[string]struct{}
 	done               bool
 	oldValue           func(context.Context) (*ModelListing, error)
@@ -358,6 +360,57 @@ func (m *ModelListingMutation) ResetPaid() {
 	m.paid = nil
 }
 
+// SetEffortTypes sets the "effort_types" field.
+func (m *ModelListingMutation) SetEffortTypes(s []string) {
+	m.effort_types = &s
+	m.appendeffort_types = nil
+}
+
+// EffortTypes returns the value of the "effort_types" field in the mutation.
+func (m *ModelListingMutation) EffortTypes() (r []string, exists bool) {
+	v := m.effort_types
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEffortTypes returns the old "effort_types" field's value of the ModelListing entity.
+// If the ModelListing object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ModelListingMutation) OldEffortTypes(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEffortTypes is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEffortTypes requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEffortTypes: %w", err)
+	}
+	return oldValue.EffortTypes, nil
+}
+
+// AppendEffortTypes adds s to the "effort_types" field.
+func (m *ModelListingMutation) AppendEffortTypes(s []string) {
+	m.appendeffort_types = append(m.appendeffort_types, s...)
+}
+
+// AppendedEffortTypes returns the list of values that were appended to the "effort_types" field in this mutation.
+func (m *ModelListingMutation) AppendedEffortTypes() ([]string, bool) {
+	if len(m.appendeffort_types) == 0 {
+		return nil, false
+	}
+	return m.appendeffort_types, true
+}
+
+// ResetEffortTypes resets all changes to the "effort_types" field.
+func (m *ModelListingMutation) ResetEffortTypes() {
+	m.effort_types = nil
+	m.appendeffort_types = nil
+}
+
 // Where appends a list predicates to the ModelListingMutation builder.
 func (m *ModelListingMutation) Where(ps ...predicate.ModelListing) {
 	m.predicates = append(m.predicates, ps...)
@@ -392,7 +445,7 @@ func (m *ModelListingMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ModelListingMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.model_code != nil {
 		fields = append(fields, modellisting.FieldModelCode)
 	}
@@ -410,6 +463,9 @@ func (m *ModelListingMutation) Fields() []string {
 	}
 	if m.paid != nil {
 		fields = append(fields, modellisting.FieldPaid)
+	}
+	if m.effort_types != nil {
+		fields = append(fields, modellisting.FieldEffortTypes)
 	}
 	return fields
 }
@@ -431,6 +487,8 @@ func (m *ModelListingMutation) Field(name string) (ent.Value, bool) {
 		return m.SupportsEffort()
 	case modellisting.FieldPaid:
 		return m.Paid()
+	case modellisting.FieldEffortTypes:
+		return m.EffortTypes()
 	}
 	return nil, false
 }
@@ -452,6 +510,8 @@ func (m *ModelListingMutation) OldField(ctx context.Context, name string) (ent.V
 		return m.OldSupportsEffort(ctx)
 	case modellisting.FieldPaid:
 		return m.OldPaid(ctx)
+	case modellisting.FieldEffortTypes:
+		return m.OldEffortTypes(ctx)
 	}
 	return nil, fmt.Errorf("unknown ModelListing field %s", name)
 }
@@ -502,6 +562,13 @@ func (m *ModelListingMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetPaid(v)
+		return nil
+	case modellisting.FieldEffortTypes:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEffortTypes(v)
 		return nil
 	}
 	return fmt.Errorf("unknown ModelListing field %s", name)
@@ -569,6 +636,9 @@ func (m *ModelListingMutation) ResetField(name string) error {
 		return nil
 	case modellisting.FieldPaid:
 		m.ResetPaid()
+		return nil
+	case modellisting.FieldEffortTypes:
+		m.ResetEffortTypes()
 		return nil
 	}
 	return fmt.Errorf("unknown ModelListing field %s", name)

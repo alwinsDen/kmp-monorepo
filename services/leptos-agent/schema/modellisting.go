@@ -19,6 +19,7 @@ func (ModelListing) Fields() []ent.Field {
 		field.Bool("is_supported").Default(false),
 		field.Bool("supports_effort").Default(false),
 		field.Bool("paid").Default(false),
+		field.Strings("effort_types").Default([]string{}),
 	}
 }
 

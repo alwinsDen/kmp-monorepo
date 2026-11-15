@@ -65,4 +65,8 @@ func init() {
 	modellistingDescPaid := modellistingFields[5].Descriptor()
 	// modellisting.DefaultPaid holds the default value on creation for the paid field.
 	modellisting.DefaultPaid = modellistingDescPaid.Default.(bool)
+	// modellistingDescEffortTypes is the schema descriptor for effort_types field.
+	modellistingDescEffortTypes := modellistingFields[6].Descriptor()
+	// modellisting.DefaultEffortTypes holds the default value on creation for the effort_types field.
+	modellisting.DefaultEffortTypes = modellistingDescEffortTypes.Default.([]string)
 }

@@ -79,6 +79,12 @@ func (_c *ModelListingCreate) SetNillablePaid(v *bool) *ModelListingCreate {
 	return _c
 }
 
+// SetEffortTypes sets the "effort_types" field.
+func (_c *ModelListingCreate) SetEffortTypes(v []string) *ModelListingCreate {
+	_c.mutation.SetEffortTypes(v)
+	return _c
+}
+
 // Mutation returns the ModelListingMutation object of the builder.
 func (_c *ModelListingCreate) Mutation() *ModelListingMutation {
 	return _c.mutation
@@ -126,6 +132,10 @@ func (_c *ModelListingCreate) defaults() {
 		v := modellisting.DefaultPaid
 		_c.mutation.SetPaid(v)
 	}
+	if _, ok := _c.mutation.EffortTypes(); !ok {
+		v := modellisting.DefaultEffortTypes
+		_c.mutation.SetEffortTypes(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -162,6 +172,9 @@ func (_c *ModelListingCreate) check() error {
 	}
 	if _, ok := _c.mutation.Paid(); !ok {
 		return &ValidationError{Name: "paid", err: errors.New(`ent: missing required field "ModelListing.paid"`)}
+	}
+	if _, ok := _c.mutation.EffortTypes(); !ok {
+		return &ValidationError{Name: "effort_types", err: errors.New(`ent: missing required field "ModelListing.effort_types"`)}
 	}
 	return nil
 }
@@ -212,6 +225,10 @@ func (_c *ModelListingCreate) createSpec() (*ModelListing, *sqlgraph.CreateSpec)
 	if value, ok := _c.mutation.Paid(); ok {
 		_spec.SetField(modellisting.FieldPaid, field.TypeBool, value)
 		_node.Paid = value
+	}
+	if value, ok := _c.mutation.EffortTypes(); ok {
+		_spec.SetField(modellisting.FieldEffortTypes, field.TypeJSON, value)
+		_node.EffortTypes = value
 	}
 	return _node, _spec
 }

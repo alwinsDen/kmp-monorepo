@@ -23,6 +23,8 @@ const (
 	FieldSupportsEffort = "supports_effort"
 	// FieldPaid holds the string denoting the paid field in the database.
 	FieldPaid = "paid"
+	// FieldEffortTypes holds the string denoting the effort_types field in the database.
+	FieldEffortTypes = "effort_types"
 	// Table holds the table name of the modellisting in the database.
 	Table = "model_listings"
 )
@@ -36,6 +38,7 @@ var Columns = []string{
 	FieldIsSupported,
 	FieldSupportsEffort,
 	FieldPaid,
+	FieldEffortTypes,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -61,6 +64,8 @@ var (
 	DefaultSupportsEffort bool
 	// DefaultPaid holds the default value on creation for the "paid" field.
 	DefaultPaid bool
+	// DefaultEffortTypes holds the default value on creation for the "effort_types" field.
+	DefaultEffortTypes []string
 )
 
 // OrderOption defines the ordering options for the ModelListing queries.

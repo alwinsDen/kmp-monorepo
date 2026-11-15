@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/alwinsden/kmp-monorepo/services/leptos-agent/ent/modellisting"
 	"github.com/alwinsden/kmp-monorepo/services/leptos-agent/ent/predicate"
@@ -111,6 +112,18 @@ func (_u *ModelListingUpdate) SetNillablePaid(v *bool) *ModelListingUpdate {
 	return _u
 }
 
+// SetEffortTypes sets the "effort_types" field.
+func (_u *ModelListingUpdate) SetEffortTypes(v []string) *ModelListingUpdate {
+	_u.mutation.SetEffortTypes(v)
+	return _u
+}
+
+// AppendEffortTypes appends value to the "effort_types" field.
+func (_u *ModelListingUpdate) AppendEffortTypes(v []string) *ModelListingUpdate {
+	_u.mutation.AppendEffortTypes(v)
+	return _u
+}
+
 // Mutation returns the ModelListingMutation object of the builder.
 func (_u *ModelListingUpdate) Mutation() *ModelListingMutation {
 	return _u.mutation
@@ -192,6 +205,14 @@ func (_u *ModelListingUpdate) sqlSave(ctx context.Context) (_node int, err error
 	}
 	if value, ok := _u.mutation.Paid(); ok {
 		_spec.SetField(modellisting.FieldPaid, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.EffortTypes(); ok {
+		_spec.SetField(modellisting.FieldEffortTypes, field.TypeJSON, value)
+	}
+	if value, ok := _u.mutation.AppendedEffortTypes(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, modellisting.FieldEffortTypes, value)
+		})
 	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -294,6 +315,18 @@ func (_u *ModelListingUpdateOne) SetNillablePaid(v *bool) *ModelListingUpdateOne
 	if v != nil {
 		_u.SetPaid(*v)
 	}
+	return _u
+}
+
+// SetEffortTypes sets the "effort_types" field.
+func (_u *ModelListingUpdateOne) SetEffortTypes(v []string) *ModelListingUpdateOne {
+	_u.mutation.SetEffortTypes(v)
+	return _u
+}
+
+// AppendEffortTypes appends value to the "effort_types" field.
+func (_u *ModelListingUpdateOne) AppendEffortTypes(v []string) *ModelListingUpdateOne {
+	_u.mutation.AppendEffortTypes(v)
 	return _u
 }
 
@@ -408,6 +441,14 @@ func (_u *ModelListingUpdateOne) sqlSave(ctx context.Context) (_node *ModelListi
 	}
 	if value, ok := _u.mutation.Paid(); ok {
 		_spec.SetField(modellisting.FieldPaid, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.EffortTypes(); ok {
+		_spec.SetField(modellisting.FieldEffortTypes, field.TypeJSON, value)
+	}
+	if value, ok := _u.mutation.AppendedEffortTypes(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, modellisting.FieldEffortTypes, value)
+		})
 	}
 	_node = &ModelListing{config: _u.config}
 	_spec.Assign = _node.assignValues
