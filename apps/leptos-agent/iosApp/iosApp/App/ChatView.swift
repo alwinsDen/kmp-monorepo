@@ -156,14 +156,7 @@ struct ContentView: View {
                         item: $selectedUsageModel,
                         onDismiss: {},
                         content: { _ in
-                            VStack {
-                                HStack {
-                                    Text("Choose Model")
-                                        .font(.title3)
-                                }
-                            }
-                            .padding(12)
-                            .presentationDetents([.medium])
+                            ModelSelection()
                         }
                     )
                     .background(.ultraThinMaterial, in: .rect(cornerRadius: 8))
@@ -187,7 +180,11 @@ struct ContentView: View {
                             await chatViewModel.send(prompt: prompt)
                         }
                     } label: {
-                        SharedIcon(systemName: "paperplane.circle.fill")
+                        Image(systemName: "paperplane.circle.fill")
+                            .font(.largeTitle)
+                            .frame(width: 34, height: 34)
+                            .symbolRenderingMode(.palette)
+                            .foregroundStyle(.white, .blue)
                     }
                     .labelStyle(.iconOnly)
                     .buttonStyle(.plain)
