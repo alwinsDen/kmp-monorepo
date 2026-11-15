@@ -96,7 +96,7 @@ struct ContentView: View {
                 .overlay {
                     if chatViewModel.chatArray.isEmpty {
                         VStack(spacing: 8) {
-                            Text("Welcome, Alwin")
+                            Text("Welcome, Alwin!")
                                 .font(.largeTitle.weight(.bold))
                             Text("Leptos agent is here for you")
                                 .font(.body)
@@ -148,7 +148,8 @@ struct ContentView: View {
                             provider: "openrouter"
                         )
                     } label: {
-                        Text("Leptos Basic")
+                        Text("Openrouter/GLM-4.5")
+                            .font(.subheadline)
                             .foregroundStyle(Color.primary.opacity(0.8))
                             .padding(6)
                     }
@@ -159,7 +160,6 @@ struct ContentView: View {
                             ModelSelection()
                         }
                     )
-                    .background(.ultraThinMaterial, in: .rect(cornerRadius: 8))
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
                             .stroke(Color.primary.opacity(0.8), lineWidth: 0.5)
@@ -191,9 +191,9 @@ struct ContentView: View {
                 }
             }
             .padding(12)
-            .background(.ultraThinMaterial, in: .rect(cornerRadius: 14))
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
             .overlay(
-                RoundedRectangle(cornerRadius: 14)
+                RoundedRectangle(cornerRadius: 20)
                     .stroke(Color.secondary.opacity(0.8), lineWidth: 0.5)
             )
             .padding(.horizontal, 15)

@@ -35,27 +35,37 @@ struct ModelSelection : View {
     @State private var selectedModel: String = "GLM-5.3-lite"
     @State private var modelList : [String] = ["GLM-5.3-lite", "GLM-5.4"]
     @State private var effort : Effort = .medium
+    @State private var isLeptosProvider : Bool = true
     
     var body : some View {
         VStack {
-            HStack {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.system(size: 44))
-                    .frame(width: 44, height: 44)
-                    .symbolRenderingMode(.multicolor)
-                    .foregroundStyle(.white)
-                Spacer()
-                Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 44))
-                    .frame(width: 44, height: 44)
-                    .symbolRenderingMode(.multicolor)
-                    .foregroundStyle(.white)
-            }.padding(12)
+//            HStack {
+//                Image(systemName: "xmark.circle.fill")
+//                    .font(.system(size: 44))
+//                    .frame(width: 44, height: 44)
+//                    .symbolRenderingMode(.multicolor)
+//                    .foregroundStyle(.white)
+//                Spacer()
+//                Image(systemName: "checkmark.circle.fill")
+//                    .font(.system(size: 44))
+//                    .frame(width: 44, height: 44)
+//                    .symbolRenderingMode(.multicolor)
+//                    .foregroundStyle(.white)
+//            }.padding(12)
             VStack() {
                 Form {
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("Providers & Models")
-                            .font(.system(size: 22, weight: .bold))
+                        HStack(alignment: .center) {
+                            Text("Providers & Models")
+                                .font(.system(size: 22, weight: .bold))
+                            Spacer()
+//                            ProgressView()
+//                                .progressViewStyle(.circular)
+//                                .controlSize(.small)
+                            Text("saved")
+                                .font(.subheadline)
+                                .foregroundStyle(.blue)
+                        }
                         Text("Select the Provider and related model. You can switch between on-device BYOK or use free limited time model usage.")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
@@ -74,10 +84,11 @@ struct ModelSelection : View {
                     }
                     VStack {
                         HStack {
-                            Text("Select Thinking effort")
-                                .foregroundStyle(.secondary)
+                            Text("Thinking effort")
                             Spacer()
                             Text(effort.label)
+                                .foregroundStyle(.secondary)
+                                .bold()
                         }
                         Slider(value: Binding(
                             get: { effort.rawValue },
@@ -100,9 +111,12 @@ struct ModelSelection : View {
                             }
                         }
                     }
+                    Toggle(isOn: $isLeptosProvider){
+                        Text("Use Leptos online model")
+                    }
                 }
             }
         }
-        .presentationDetents([.medium])
+        .presentationDetents([.medium, .large])
     }
 }
