@@ -9,8 +9,7 @@ import androidx.room3.PrimaryKey
     indices = [Index(value = ["userId"], unique = true)]
 )
 data class ModelPreferencesEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Long = 0,
+    @PrimaryKey
     val userId: String,
     val modelProvider: String,
     val model: String,

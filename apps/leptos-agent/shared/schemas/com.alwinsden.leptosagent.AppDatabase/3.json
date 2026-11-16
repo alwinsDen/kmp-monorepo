@@ -2,18 +2,12 @@
   "formatVersion": 1,
   "database": {
     "version": 3,
-    "identityHash": "8d2b0cb5783e72b9f43c0a7f4f7a6cdf",
+    "identityHash": "f4aef8d66c5e2615bcc2e91a170b678c",
     "entities": [
       {
         "tableName": "ModelPreferencesEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `userId` TEXT NOT NULL, `modelProvider` TEXT NOT NULL, `model` TEXT NOT NULL, `effortLevel` TEXT NOT NULL, `useOnlineLeptos` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`userId` TEXT NOT NULL, `modelProvider` TEXT NOT NULL, `model` TEXT NOT NULL, `effortLevel` TEXT NOT NULL, `useOnlineLeptos` INTEGER NOT NULL, PRIMARY KEY(`userId`))",
         "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
           {
             "fieldPath": "userId",
             "columnName": "userId",
@@ -46,9 +40,9 @@
           }
         ],
         "primaryKey": {
-          "autoGenerate": true,
+          "autoGenerate": false,
           "columnNames": [
-            "id"
+            "userId"
           ]
         },
         "indices": [
@@ -66,7 +60,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8d2b0cb5783e72b9f43c0a7f4f7a6cdf')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f4aef8d66c5e2615bcc2e91a170b678c')"
     ]
   }
 }

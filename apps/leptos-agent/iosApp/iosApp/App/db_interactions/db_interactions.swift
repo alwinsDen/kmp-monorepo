@@ -1,7 +1,6 @@
 import Shared
 
 func saveModelPrefs(
-    id: Int64,
     userId: String,
     modelProvider: String,
     model: String,
@@ -11,7 +10,6 @@ func saveModelPrefs(
     let db  = DatabaseProvider.shared.database
     let dao = db.getDao()
     let prefs = ModelPreferencesEntity(
-        id: id,
         userId: userId,
         modelProvider: modelProvider,
         model: model,

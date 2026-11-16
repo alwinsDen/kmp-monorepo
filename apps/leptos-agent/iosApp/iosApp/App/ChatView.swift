@@ -121,9 +121,6 @@ struct ContentView: View {
                 HStack {
                     Menu {
                         Button {
-//                            UserPrefsRead.shared.observeAll{list in
-//                                print(list)
-//                            }
                         } label: {
                             Label("Camera", systemImage: "camera")
                         }

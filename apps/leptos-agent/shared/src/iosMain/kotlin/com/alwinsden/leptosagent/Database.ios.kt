@@ -16,7 +16,10 @@ fun getDatabaseBuilder(): RoomDatabase.Builder<AppDatabase> {
 
 object DatabaseProvider {
     val database : AppDatabase by lazy {
-        getRoomDatabase(getDatabaseBuilder())
+        getRoomDatabase(
+            getDatabaseBuilder(),
+            debugModeMigrationErase = BuildKonfig.IS_XCODE_DEBUG_BUILD
+        )
     }
 }
 

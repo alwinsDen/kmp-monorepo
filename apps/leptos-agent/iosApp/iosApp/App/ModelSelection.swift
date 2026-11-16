@@ -6,52 +6,61 @@
 //
 
 import SwiftUI
+import Shared
 
 struct ModelSelection : View {
-    enum Provider : String, CaseIterable, Identifiable {
-        case anthropic, openrouter, openAI
-        var id : Self { self }
-    }
     
     enum Effort : Double, CaseIterable {
         case low = 0.0
         case medium = 0.25
         case high = 0.5
-        case xhigh = 0.75
+        case `default` = 0.75
         case max = 1.0
         
         var label: String {
             switch self {
-            case .low: "Low"
-            case .medium: "Medium"
-            case .high: "High"
-            case .xhigh: "XHigh"
-            case .max: "Max"
+            case .low: "low"
+            case .medium: "medium"
+            case .high: "high"
+            case .`default`: "default"
+            case .max: "max"
             }
+        }
+        
+        init(dbValue: String) {
+            let normalized = dbValue.lowercased().trimmingCharacters(in: .whitespaces)
+            self = Effort.allCases.first { $0.label == normalized } ?? .`default`
         }
     }
     
-    @State private var selectedProvider : Provider = .openrouter
-    @State private var selectedModel: String = "GLM-5.3-lite"
-    @State private var modelList : [String] = ["GLM-5.3-lite", "GLM-5.4"]
-    @State private var effort : Effort = .medium
-    @State private var isLeptosProvider : Bool = true
+    private var modelList : [String] = ["GLM-5.3-lite", "GLM-5.4"]
+    private var providerList : [String] = ["openrouter","anthropic","openai"]
+    
+    //breakdown of the user selections
+    @State private var provider : String = "openrouter"
+    @State private var model : String = "GLM-5.3-lite"
+    @State private var effortSelected : String = "default"  // DB-backed source of truth
+    @State private var isOnlineMode : Bool = false
+    
+    
+    private var effort : Effort {
+        get { Effort(dbValue: effortSelected) }
+        nonmutating set { effortSelected = newValue.label }
+    }
+    
+    
+    private func persistPrefs() {
+        saveModelPrefs(
+            userId: "Self.localUserId",          // ← see note below
+            modelProvider: provider,
+            model: model,
+            effort: effortSelected,
+            useOnlineLeptos: isOnlineMode
+        )
+    }
     
     var body : some View {
         VStack {
-            //            HStack {
-            //                Image(systemName: "xmark.circle.fill")
-            //                    .font(.system(size: 44))
-            //                    .frame(width: 44, height: 44)
-            //                    .symbolRenderingMode(.multicolor)
-            //                    .foregroundStyle(.white)
-            //                Spacer()
-            //                Image(systemName: "checkmark.circle.fill")
-            //                    .font(.system(size: 44))
-            //                    .frame(width: 44, height: 44)
-            //                    .symbolRenderingMode(.multicolor)
-            //                    .foregroundStyle(.white)
-            //            }.padding(12)
             VStack() {
                 Form {
                     VStack(alignment: .leading, spacing: 12) {
@@ -59,9 +68,9 @@ struct ModelSelection : View {
                             Text("Providers & Models")
                                 .font(.system(size: 22, weight: .bold))
                             Spacer()
-                            //                            ProgressView()
-                            //                                .progressViewStyle(.circular)
-                            //                                .controlSize(.small)
+                            // ProgressView()
+                            // .progressViewStyle(.circular)
+                            // .controlSize(.small)
                             Text("saved")
                                 .font(.subheadline)
                                 .foregroundStyle(.blue)
@@ -73,31 +82,33 @@ struct ModelSelection : View {
                         .foregroundStyle(.secondary)
                         .lineSpacing(3)
                     }
-                    Picker("Provider", selection: $selectedProvider) {
-                        ForEach(Provider.allCases) {flavor in
-                            Text(flavor.rawValue.capitalized)
+                    Picker("Provider", selection: $provider) {
+                        ForEach(providerList, id: \.self) {flavor in
+                            Text(flavor.capitalized)
                                 .tag(flavor)
                         }
                     }
-                    Picker("Model", selection: $selectedModel) {
+                    .onChange(of: provider){_,_ in persistPrefs()}
+                    Picker("Model", selection: $model) {
                         ForEach(modelList, id: \.self) {model in
                             Text(model)
                         }
                     }
+                    .onChange(of: model){_,_ in persistPrefs()}
                     VStack {
                         HStack {
                             Text("Thinking effort")
                             Spacer()
-                            Text(effort.label)
+                            Text(effort.label.capitalized)
                                 .foregroundStyle(.secondary)
-                                .bold()
                         }
                         Slider(value: Binding(
                             get: { effort.rawValue },
-                            set: { newValue, _ in
+                            set: { newValue, transacting in
                                 effort = Effort.allCases.min(
                                     by: { abs($0.rawValue - newValue) < abs($1.rawValue - newValue) }
                                 ) ?? .medium
+                                if !transacting.isContinuous { persistPrefs() }
                             }
                         )) {
                             Text("Effort")
@@ -113,8 +124,19 @@ struct ModelSelection : View {
                             }
                         }
                     }
-                    Toggle(isOn: $isLeptosProvider){
+                    Toggle(isOn: $isOnlineMode){
                         Text("Use Leptos online model")
+                    }
+                    .onChange(of: isOnlineMode){_,_ in persistPrefs()}
+                }
+            }
+            .onAppear{
+                UserPrefsRead.shared.observeAll{list in
+                    if(list.count>0){
+                        provider = list[0].modelProvider
+                        model = list[0].model
+                        effortSelected = list[0].effortLevel
+                        isOnlineMode = list[0].useOnlineLeptos
                     }
                 }
             }

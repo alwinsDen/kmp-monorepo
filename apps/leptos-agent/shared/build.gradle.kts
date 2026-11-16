@@ -1,4 +1,5 @@
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.BOOLEAN
 import io.github.cdimascio.dotenv.Dotenv
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -109,6 +110,13 @@ abstract class ServerEndpointValueSource : ValueSource<String, ServerEndpointVal
     }
 }
 
+abstract class XcodeConfigurationValueSource : ValueSource<String, ValueSourceParameters.None> {
+    override fun obtain(): String = System.getenv("CONFIGURATION") ?: ""
+}
+
+val xcodeConfiguration = providers.of(XcodeConfigurationValueSource::class) {}.get()
+val isDebugBuild = xcodeConfiguration.equals("Debug", ignoreCase = true)
+
 val serverEndpoint = providers.of(ServerEndpointValueSource::class) {
     parameters { envFile.set(rootProject.file(".commom.env")) }
 }.get()
@@ -117,6 +125,7 @@ buildkonfig {
     packageName = "com.alwinsden.leptosagent"
     defaultConfigs {
         buildConfigField(STRING, "SERVER_ENDPOINT", serverEndpoint)
+        buildConfigField(BOOLEAN, "IS_XCODE_DEBUG_BUILD", isDebugBuild.toString())
     }
 }
 
