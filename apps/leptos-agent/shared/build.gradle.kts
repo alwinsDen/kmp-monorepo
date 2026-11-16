@@ -8,6 +8,8 @@ plugins {
     alias(libs.plugins.openapiGenerator)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.buildkonfig)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.androidx.room3)
 }
 
 kotlin {
@@ -46,6 +48,8 @@ kotlin {
                 implementation(ktorLibs.client.core)
                 implementation(ktorLibs.client.contentNegotiation)
                 implementation(ktorLibs.serialization.kotlinx.json)
+                implementation(libs.androidx.room3.runtime)
+                implementation(libs.androidx.sqlite.bundled)
             }
         }
         androidMain.dependencies {
@@ -60,6 +64,11 @@ kotlin {
     }
 }
 
+dependencies {
+    add("kspAndroid", libs.androidx.room3.compiler)
+    add("kspIosArm64", libs.androidx.room3.compiler)
+    add("kspIosSimulatorArm64", libs.androidx.room3.compiler)
+}
 // Generates @Serializable Kotlin data classes from services/leptos-agent/api.yaml.
 // Runs automatically before every compilation; rerun manually with ./gradlew :apps:leptos-agent:shared:openApiGenerate
 tasks.openApiGenerate {
@@ -111,7 +120,16 @@ buildkonfig {
     }
 }
 
+room3 {
+    schemaDirectory("$projectDir/schemas")
+}
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask<*>>().configureEach {
+    dependsOn(tasks.openApiGenerate)
+}
+// KSP tasks consume commonMain sources too (which include the generated
+// openapi dir), so they need the same ordering as the Kotlin compilation
+// tasks above.
+tasks.matching { it.name.startsWith("ksp") }.configureEach {
     dependsOn(tasks.openApiGenerate)
 }
 

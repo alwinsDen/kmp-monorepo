@@ -3,20 +3,20 @@ import SwiftUI
 import Textual
 
 struct ContentView: View {
-
+    
     struct SelectedModelTypes: Identifiable {
         let id = UUID()
         let model_code: String
         let provider: String
     }
-
+    
     @StateObject private var chatViewModel = ChatViewModel()
     @State private var userQuery: String = ""
     @State private var showLeptosWork = false
     @State private var showContent = false
     @FocusState private var isChatInputInFocus: Bool
     @State private var selectedUsageModel: SelectedModelTypes?
-
+    
     private func scrollToBottom(_ proxy: ScrollViewProxy) {
         if let last = chatViewModel.chatArray.last {
             withAnimation(.easeOut(duration: 0.15)) {
@@ -24,7 +24,7 @@ struct ContentView: View {
             }
         }
     }
-
+    
     var body: some View {
         VStack {
             ScrollViewReader { proxy in
@@ -79,7 +79,7 @@ struct ContentView: View {
                                         opacity in
                                         text.opacity(opacity)
                                     } animation: { _ in
-                                        .easeInOut(duration: 0.7)
+                                            .easeInOut(duration: 0.7)
                                     }
                                 Spacer()
                             }.padding(.vertical, 0)
@@ -121,7 +121,9 @@ struct ContentView: View {
                 HStack {
                     Menu {
                         Button {
-                            print("C:camera-lock")
+//                            UserPrefsRead.shared.observeAll{list in
+//                                print(list)
+//                            }
                         } label: {
                             Label("Camera", systemImage: "camera")
                         }
@@ -214,7 +216,7 @@ struct ContentView: View {
 private struct StreamingRevealText: View {
     let message: ChatViewModel.ChatMessage
     let revealWindow: [Int]
-
+    
     var body: some View {
         ZStack(alignment: .topLeading) {
             layer(at: 2)
@@ -224,13 +226,13 @@ private struct StreamingRevealText: View {
                 .opacity(0.3)
         }
     }
-
+    
     /// One reveal layer: the message text up to the reveal position 'lag'
     /// ticks behind the newest one.
     private func layer(at lag: Int) -> some View {
         let count = lag < revealWindow.count
-            ? min(revealWindow[lag], message.text.count)
-            : 0
+        ? min(revealWindow[lag], message.text.count)
+        : 0
         return StructuredText(markdown: String(message.text.prefix(count)))
     }
 }

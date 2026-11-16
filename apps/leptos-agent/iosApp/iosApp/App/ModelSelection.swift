@@ -39,19 +39,19 @@ struct ModelSelection : View {
     
     var body : some View {
         VStack {
-//            HStack {
-//                Image(systemName: "xmark.circle.fill")
-//                    .font(.system(size: 44))
-//                    .frame(width: 44, height: 44)
-//                    .symbolRenderingMode(.multicolor)
-//                    .foregroundStyle(.white)
-//                Spacer()
-//                Image(systemName: "checkmark.circle.fill")
-//                    .font(.system(size: 44))
-//                    .frame(width: 44, height: 44)
-//                    .symbolRenderingMode(.multicolor)
-//                    .foregroundStyle(.white)
-//            }.padding(12)
+            //            HStack {
+            //                Image(systemName: "xmark.circle.fill")
+            //                    .font(.system(size: 44))
+            //                    .frame(width: 44, height: 44)
+            //                    .symbolRenderingMode(.multicolor)
+            //                    .foregroundStyle(.white)
+            //                Spacer()
+            //                Image(systemName: "checkmark.circle.fill")
+            //                    .font(.system(size: 44))
+            //                    .frame(width: 44, height: 44)
+            //                    .symbolRenderingMode(.multicolor)
+            //                    .foregroundStyle(.white)
+            //            }.padding(12)
             VStack() {
                 Form {
                     VStack(alignment: .leading, spacing: 12) {
@@ -59,17 +59,19 @@ struct ModelSelection : View {
                             Text("Providers & Models")
                                 .font(.system(size: 22, weight: .bold))
                             Spacer()
-//                            ProgressView()
-//                                .progressViewStyle(.circular)
-//                                .controlSize(.small)
+                            //                            ProgressView()
+                            //                                .progressViewStyle(.circular)
+                            //                                .controlSize(.small)
                             Text("saved")
                                 .font(.subheadline)
                                 .foregroundStyle(.blue)
                         }
-                        Text("Select the Provider and related model. You can switch between on-device BYOK or use free limited time model usage.")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                            .lineSpacing(3)
+                        Text(
+                            "Select the Provider and related model. You can switch between on-device BYOK or use free limited time model usage."
+                        )
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .lineSpacing(3)
                     }
                     Picker("Provider", selection: $selectedProvider) {
                         ForEach(Provider.allCases) {flavor in
