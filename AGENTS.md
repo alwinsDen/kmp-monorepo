@@ -104,6 +104,9 @@ generation also runs automatically before every `:shared` compilation. Current s
 apps/leptos-agent/androidApp    # Android entry (com.alwinsden.leptosagent.MainActivity)
 apps/leptos-agent/iosApp        # pure SwiftUI; consumes the `Shared` framework (import Shared)
 apps/leptos-agent/shared        # KMP module: android + iosArm64/iosSimulatorArm64
+apps/eight-params/androidApp    # Android entry (com.alwinsden.eightparams.MainActivity) — depends on :apps:eight-params:shared
+apps/eight-params/iosApp        # SwiftUI hello-world; consumes the `Shared` framework (import Shared)
+apps/eight-params/shared        # KMP hello-world shell: android + iosArm64/iosSimulatorArm64 (no backend yet; wizard's sharedLogic/sharedUI merged into `shared`)
 services/leptos-agent           # Go backend for the app (LLM responses streamed from OpenRouter)
 services/commonStructs          # small Go structs package shared across services
 ```
