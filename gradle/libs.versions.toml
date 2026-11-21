@@ -8,6 +8,9 @@ androidx-lifecycle = "2.11.0-beta01"
 composeMultiplatform = "1.12.2"
 kotlin = "2.4.21"
 kotlinx-serialization = "1.9.0"
+kotlinx-datetime = "0.6.2"
+androidx-icons = "1.7.8"
+vico = "3.3.1"
 material3 = "1.11.0-alpha07"
 logback = "1.5.37"
 openapiGenerator = "7.14.0"
@@ -32,6 +35,9 @@ compose-uiToolingPreview = { module = "org.jetbrains.compose.ui:ui-tooling-previ
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
+androidx-icons-core = { module = "androidx.compose.material:material-icons-core", version.ref = "androidx-icons" }
+vico-compose = { module = "com.patrykandpatrick.vico:compose", version.ref = "vico" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3Version" }
 androidx-sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
 androidx-room3-runtime = { module = "androidx.room3:room3-runtime", version.ref = "room3" }

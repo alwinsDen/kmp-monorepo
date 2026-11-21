@@ -105,8 +105,13 @@ apps/leptos-agent/androidApp    # Android entry (com.alwinsden.leptosagent.MainA
 apps/leptos-agent/iosApp        # pure SwiftUI; consumes the `Shared` framework (import Shared)
 apps/leptos-agent/shared        # KMP module: android + iosArm64/iosSimulatorArm64
 apps/eight-params/androidApp    # Android entry (com.alwinsden.eightparams.MainActivity) — depends on :apps:eight-params:shared
+                                # Apple Health–style tracker UI: Summary home, metric detail (D/W/M/6M/Y line charts),
+                                # logging sheet; weight, height, blood pressure, sleep
 apps/eight-params/iosApp        # SwiftUI hello-world; consumes the `Shared` framework (import Shared)
-apps/eight-params/shared        # KMP hello-world shell: android + iosArm64/iosSimulatorArm64 (no backend yet; wizard's sharedLogic/sharedUI merged into `shared`)
+apps/eight-params/shared        # KMP: health domain shared with a future iOS UI — Room DB (HealthEntryEntity/
+                                # HealthEntryDao/HealthDatabase, Room3 KMP), MetricType, ChartAggregation (D/W/M/6M/Y
+                                # bucketing, weekly ticks, pannable windows via backSteps, AVERAGE header, nice y-axis),
+                                # formatters; commonTest covers it. The Android chart UI renders it with Vico 3.3.1.
 services/leptos-agent           # Go backend for the app (LLM responses streamed from OpenRouter)
 services/commonStructs          # small Go structs package shared across services
 ```

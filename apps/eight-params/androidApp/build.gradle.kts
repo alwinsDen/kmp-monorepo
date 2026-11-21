@@ -14,6 +14,9 @@ dependencies {
     implementation(project(":apps:eight-params:shared"))
 
     implementation(libs.androidx.activity.compose)
+    implementation(libs.kotlinx.datetime)
+    implementation(libs.androidx.icons.core)
+    implementation(libs.vico.compose)
 
     implementation(libs.compose.uiToolingPreview)
     implementation(libs.androidx.material3)
