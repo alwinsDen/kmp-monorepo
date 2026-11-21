@@ -32,3 +32,5 @@ dependencyResolutionManagement {
 
 include(":apps:leptos-agent:androidApp")
 include(":apps:leptos-agent:shared")
+
+include("libraries:leptos-core")

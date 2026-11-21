@@ -131,7 +131,7 @@ struct ModelSelection : View {
                 }
             }
             .onAppear{
-                UserPrefsRead.shared.observeAll{list in
+                UserPrefsRead().observeAll{list in
                     if(list.count>0){
                         provider = list[0].modelProvider
                         model = list[0].model

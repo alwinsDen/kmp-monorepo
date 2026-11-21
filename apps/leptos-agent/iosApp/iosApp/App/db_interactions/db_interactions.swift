@@ -7,7 +7,7 @@ func saveModelPrefs(
     effort: String,
     useOnlineLeptos: Bool
 ){
-    let db  = DatabaseProvider.shared.database
+    let db  = DatabaseProvider().database
     let dao = db.getDao()
     let prefs = ModelPreferencesEntity(
         userId: userId,

@@ -21,6 +21,7 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "Shared"
             isStatic = true
+            export(project(":libraries:leptos-core"))
         }
     }
 
@@ -51,6 +52,7 @@ kotlin {
                 implementation(ktorLibs.serialization.kotlinx.json)
                 implementation(libs.androidx.room3.runtime)
                 implementation(libs.androidx.sqlite.bundled)
+                api(project(":libraries:leptos-core"))
             }
         }
         androidMain.dependencies {
